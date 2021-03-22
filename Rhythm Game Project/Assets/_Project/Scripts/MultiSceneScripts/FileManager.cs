@@ -1,5 +1,6 @@
 ﻿namespace File
 {
+    using Enums;
     using System;
     using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
@@ -9,11 +10,16 @@
     public sealed class FileManager : MonoBehaviour
     {
         #region Private Fields
+        private string beatmapDirectoryPath = string.Empty;
+        private string[] beatmapDirectories;
+
         private Beatmap beatmap;
         #endregion
 
         #region Properties
         public Beatmap Beatmap => beatmap;
+        public string BeatmapDirectoryPath => beatmapDirectoryPath;
+        public string[] BeatmapDirectories => beatmapDirectories;
         #endregion
 
         #region Public Methods
@@ -29,35 +35,47 @@
         #region Private Methods
         private void Awake()
         {
+            beatmapDirectoryPath = $"{Application.persistentDataPath}/Beatmaps";
+            SetBeatmapDirectories();
             CreateNewBeatmapFileTest();
+        }
+
+        private void SetBeatmapDirectories()
+        {
+            beatmapDirectories = Directory.GetDirectories(beatmapDirectoryPath);
         }
 
         private void CreateNewBeatmapFileTest()
         {
             beatmap = new Beatmap();
 
-            string folderName = "TestFolder";
+            string folderName = "Magical";
             string beatmapFolder = "Beatmaps";
-            string easyFile = "easy.bm";
-            string filePath = $"{Application.persistentDataPath}/{beatmapFolder}/{folderName}/{easyFile}";
+            string difficultyFile = "hard.bm";
+            string filePath = $"{Application.persistentDataPath}/{beatmapFolder}/{folderName}/{difficultyFile}";
 
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             Stream stream = new FileStream(filePath, FileMode.Create);
 
-            beatmap.SongName = "Beyond";
-            beatmap.ArtistName = "XI";
+            beatmap.SongName = "Really really really really really really really long name for testing";
+            beatmap.ArtistName = "Unknown artist name";
             beatmap.CreatorName = "Ashley";
-            beatmap.DifficultyName = "Skystar";
-            beatmap.CreatorMessage = "This is my creator message";
-            beatmap.TotalObjects = 500;
-            beatmap.TotalFeverPhrases = 6;
+            beatmap.Genre = "Hardcore";
+            beatmap.Difficulty = Difficulty.Hard;
+            beatmap.PlayerDifficultyGrade = "S";
+            beatmap.PlayerDifficultyGradeUsername = "Ashley";
+            beatmap.CreatorMessage = "Hard difficulty???";
+            beatmap.TotalObjects = 1005;
+            beatmap.TotalFeverPhrases = 20;
+            beatmap.AudioStartTime = 25f;
             beatmap.BeatsPerMinute = 125f;
             beatmap.OffsetMilliseconds = 0;
+            beatmap.DifficultyAccuracy = 54;
             beatmap.TotalKeys = 4;
             beatmap.SongLength = "2 minutes 30 seconds";
             beatmap.CreatedDate = DateTime.Now;
             beatmap.DatabaseTable = "testTable";
-            beatmap.Level = Random.Range(0, 10).ToString();
+            beatmap.Level = "9";
             beatmap.HasTypeArray = new bool[1];
             beatmap.HasTypeArray[0] = true;
 

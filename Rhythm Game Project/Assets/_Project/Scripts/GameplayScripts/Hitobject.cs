@@ -30,6 +30,9 @@
         [SerializeField] private Transform cachedTransform = default;
 
         [SerializeField] private RectTransform approachImageCachedRectTransform = default;
+
+        private IEnumerator playHitTweenCoroutine;
+        private IEnumerator playMissTweenCoroutine;
         #endregion
 
         #region Properties
@@ -40,14 +43,24 @@
         #region Public Methods
         public void PlayHitTween()
         {
-            StopCoroutine("PlayHitTweenCoroutine");
-            StartCoroutine(PlayHitTweenCoroutine());
+            if (playHitTweenCoroutine != null)
+            {
+                StopCoroutine(playHitTweenCoroutine);
+            }
+
+            playHitTweenCoroutine = PlayHitTweenCoroutine();
+            StartCoroutine(playHitTweenCoroutine);
         }
 
         public void PlayMissTween()
         {
-            StopCoroutine("PlayMissTweenCoroutine");
-            StartCoroutine(PlayMissTweenCoroutine());
+            if (playMissTweenCoroutine != null)
+            {
+                StopCoroutine(playMissTweenCoroutine);
+            }
+
+            playMissTweenCoroutine = PlayMissTweenCoroutine();
+            StartCoroutine(playMissTweenCoroutine);
         }
 
         public void UpdateHitParticleSystemColor(Color _color)
@@ -145,7 +158,6 @@
             hitobjectContainer.gameObject.SetActive(false);
             judgementContainer.gameObject.SetActive(true);
             LeanTween.alphaCanvas(canvasGroup, 0f, 0.25f).setEaseOutExpo();
-            //LeanTween.scale(gameObject, new Vector3(1.5f, 1.5f, 1f), 0.25f).setEaseOutExpo();
             LeanTween.moveLocalY(gameObject, (cachedTransform.localPosition.y - 50f), 0.25f).setEaseOutExpo();
             LeanTween.rotateLocal(gameObject, missRotateTo, 0.25f);
             yield return waitForSeconds;

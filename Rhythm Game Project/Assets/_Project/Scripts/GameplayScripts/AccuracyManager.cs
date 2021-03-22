@@ -25,6 +25,8 @@
 
         [SerializeField] private TextMeshProUGUI accuracyText = default;
 
+        private IEnumerator trackIncreasingAccuracyCoroutine;
+
         private ScoreManager scoreManager;
         private GradeSlider gradeSlider;
         private GameManager gameManager;
@@ -74,8 +76,13 @@
 
         public void TrackIncreasingAccuracy()
         {
-            StopCoroutine("TrackIncreasingAccuracyCoroutine");
-            StartCoroutine(TrackIncreasingAccuracyCoroutine());
+            if (trackIncreasingAccuracyCoroutine != null)
+            {
+                StopCoroutine(trackIncreasingAccuracyCoroutine);
+            }
+
+            trackIncreasingAccuracyCoroutine = TrackIncreasingAccuracyCoroutine();
+            StartCoroutine(trackIncreasingAccuracyCoroutine);
         }
 
         private void ResetAccuracyLerpTimer()

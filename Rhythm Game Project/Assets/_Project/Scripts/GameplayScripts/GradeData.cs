@@ -220,6 +220,41 @@
                     return gradientF;
             }
         }
+
+        public TMP_ColorGradient GetCurrentGradeGradient(string _grade)
+        {
+            switch (_grade)
+            {
+                case GradeStringSPlus:
+                    return gradientS;
+                case GradeStringS:
+                    return gradientS;
+                case GradeStringAPlus:
+                    return gradientA;
+                case GradeStringA:
+                    return gradientA;
+                case GradeStringBPlus:
+                    return gradientB;
+                case GradeStringB:
+                    return gradientB;
+                case GradeStringCPlus:
+                    return gradientC;
+                case GradeStringC:
+                    return gradientC;
+                case GradeStringDPlus:
+                    return gradientD;
+                case GradeStringD:
+                    return gradientD;
+                case GradeStringEPlus:
+                    return gradientE;
+                case GradeStringE:
+                    return gradientE;
+                case GradeStringFPlus:
+                    return gradientF;
+                default:
+                    return gradientF;
+            }
+        }
         #endregion
     }
 }

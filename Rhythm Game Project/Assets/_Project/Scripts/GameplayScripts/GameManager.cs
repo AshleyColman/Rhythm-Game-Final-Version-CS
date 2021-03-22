@@ -15,7 +15,6 @@
         private HitobjectManager hitobjectManager;
         private Countdown countdown;
         private HealthManager healthManager;
-        private SongSlider songSlider;
         private ScoreManager scoreManager;
         private Leaderboard leaderboard;
         private AccuracyManager accuracyManager;
@@ -40,7 +39,6 @@
             hitobjectSpawnManager.TrackHitobjects();
             scoreManager.TrackIncreasingScore();
             accuracyManager.TrackIncreasingAccuracy();
-            songSlider.UpdateProgress();
         }
         #endregion
 
@@ -53,7 +51,6 @@
             hitobjectManager = MonoBehaviour.FindObjectOfType<HitobjectManager>();
             countdown = MonoBehaviour.FindObjectOfType<Countdown>();
             healthManager = MonoBehaviour.FindObjectOfType<HealthManager>();
-            songSlider = MonoBehaviour.FindObjectOfType<SongSlider>();
             scoreManager = MonoBehaviour.FindObjectOfType<ScoreManager>();
             leaderboard = MonoBehaviour.FindObjectOfType<Leaderboard>();
             accuracyManager = MonoBehaviour.FindObjectOfType<AccuracyManager>();

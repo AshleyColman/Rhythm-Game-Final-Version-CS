@@ -22,6 +22,8 @@
         [SerializeField] private LeaderboardButton buttonPrefab = default;
         [SerializeField] private LeaderboardButton personalButton = default;
 
+        private IEnumerator initializeCoroutine;
+
         private ScoreManager scoreManager;
         private ComboManager comboManager;
         private GradeSlider gradeSlider;
@@ -31,8 +33,13 @@
         #region Public Methods
         public void Initialize()
         {
-            StopCoroutine("InitializeCoroutine");
-            StartCoroutine(InitializeCoroutine());
+            if (initializeCoroutine != null)
+            {
+                StopCoroutine(initializeCoroutine);
+            }
+
+            initializeCoroutine = InitializeCoroutine();
+            StartCoroutine(initializeCoroutine);
         }
 
         public void UpdatePersonalBestScore()

@@ -1,9 +1,14 @@
 ﻿namespace SceneLoading
 {
+    using System.Collections;
     using UnityEngine;
 
     public sealed class Transition : MonoBehaviour
     {
+        #region Constants
+        public const float TransitionDuration = 1f;
+        #endregion
+
         #region Private Fields
         [SerializeField] private GameObject transition = default;
         [SerializeField] private CanvasGroup transitionCanvasGroup = default;
@@ -12,18 +17,14 @@
         #region Public Methods
         public void PlayFadeInTween()
         {
-            transitionCanvasGroup.alpha = 1f;
-            LeanTween.cancel(transitionCanvasGroup.gameObject);
-
-            LeanTween.alphaCanvas(transitionCanvasGroup, 0f, 1f);
+            StopCoroutine("PlayFadeInTweenCoroutine");
+            StartCoroutine(PlayFadeInTweenCoroutine());
         }
 
         public void PlayFadeOutTween()
         {
-            transitionCanvasGroup.alpha = 0f;
-            LeanTween.cancel(transitionCanvasGroup.gameObject);
-
-            LeanTween.alphaCanvas(transitionCanvasGroup, 1f, 1f);
+            StopCoroutine("PlayFadeOutTweenCoroutine");
+            StartCoroutine(PlayFadeOutTweenCoroutine());
         }
         #endregion
 
@@ -31,6 +32,28 @@
         private void Awake()
         {
             transition.gameObject.SetActive(true);
+        }
+
+        private IEnumerator PlayFadeInTweenCoroutine()
+        {
+            transitionCanvasGroup.alpha = 1f;
+            transition.gameObject.SetActive(true);
+            LeanTween.cancel(transitionCanvasGroup.gameObject);
+            LeanTween.alphaCanvas(transitionCanvasGroup, 0f, 1f);
+            yield return new WaitForSeconds(TransitionDuration);
+            transition.gameObject.SetActive(false);
+            yield return null;
+        }
+
+        private IEnumerator PlayFadeOutTweenCoroutine()
+        {
+            transitionCanvasGroup.alpha = 0f;
+            transition.gameObject.SetActive(true);
+            LeanTween.cancel(transitionCanvasGroup.gameObject);
+            LeanTween.alphaCanvas(transitionCanvasGroup, 1f, 1f);
+            yield return new WaitForSeconds(TransitionDuration);
+            transition.gameObject.SetActive(false);
+            yield return null;
         }
         #endregion
     }

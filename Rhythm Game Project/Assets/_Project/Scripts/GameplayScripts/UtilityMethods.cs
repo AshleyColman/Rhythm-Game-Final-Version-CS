@@ -73,4 +73,11 @@ public static class UtilityMethods
         return _string;
     }
 
+    public static float GetSliderValuePercentageFromTime(float _audioStartTime, float _audioClipLength)
+    {
+        float percentage = (_audioStartTime / _audioClipLength) * 100;
+        return percentage;
+    }
+
+
 }

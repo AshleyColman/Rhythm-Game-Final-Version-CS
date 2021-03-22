@@ -1,4 +1,5 @@
 ﻿using System;
+using Enums;
 
 [Serializable]
 public sealed class Beatmap
@@ -10,6 +11,8 @@ public sealed class Beatmap
     private float[] objectPositionArrayX;
     private float[] objectPositionArrayY;
     private float beatsPerMinute;
+    private float difficultyAccuracy;
+    private float audioStartTime;
 
     private byte[] objectTypeArray;
     private byte totalKeys;
@@ -25,11 +28,15 @@ public sealed class Beatmap
     private string songName;
     private string artistName;
     private string creatorName;
-    private string difficultyName;
+    private string genre;
     private string creatorMessage;
     private string databaseTable;
     private string songLength;
     private string level;
+    private string playerDifficultyGrade;
+    private string playerDifficultyGradeUsername;
+
+    private Difficulty difficulty;
 
     private DateTime createdDate;
     #endregion
@@ -41,6 +48,8 @@ public sealed class Beatmap
     public float[] ObjectPositionArrayX { get => objectPositionArrayX; set => objectPositionArrayX = value; }
     public float[] ObjectPositionArrayY { get => objectPositionArrayY; set => objectPositionArrayY = value; }
     public float BeatsPerMinute { get => beatsPerMinute; set => beatsPerMinute = value; }
+    public float DifficultyAccuracy { get => difficultyAccuracy; set => difficultyAccuracy = value; }
+    public float AudioStartTime { get => audioStartTime; set => audioStartTime = value; }
 
     public byte[] ObjectTypeArray { get => objectTypeArray; set => objectTypeArray = value; }
     public byte TotalKeys { get => totalKeys; set => totalKeys = value; }
@@ -56,11 +65,15 @@ public sealed class Beatmap
     public string Level { get => level; set => level = value; }
     public string SongName { get => songName; set => songName = value; }
     public string ArtistName { get => artistName; set => artistName = value; }
-    public string DifficultyName { get => difficultyName; set => difficultyName = value; }
+    public string Genre { get => genre; set => genre = value; }
     public string CreatorName { get => creatorName; set => creatorName = value; }
     public string CreatorMessage { get => creatorMessage; set => creatorMessage = value; }
     public string DatabaseTable { get => databaseTable; set => databaseTable = value; }
     public string SongLength { get => songLength; set => songLength = value; }
+    public string PlayerDifficultyGrade { get => playerDifficultyGrade; set => playerDifficultyGrade = value; }
+    public string PlayerDifficultyGradeUsername { get => playerDifficultyGradeUsername; set => playerDifficultyGradeUsername = value; }
+
+    public Difficulty Difficulty { get => difficulty; set => difficulty = value; }
 
     public DateTime CreatedDate { get => createdDate; set => createdDate = value; }
     #endregion

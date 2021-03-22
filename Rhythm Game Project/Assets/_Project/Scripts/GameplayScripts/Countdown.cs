@@ -12,7 +12,7 @@
 
         private float countdownDuration = 4f;
 
-        private IEnumerator playCountdown;
+        private IEnumerator playCountdownCoroutine;
 
         private GameManager gameManager;
         #endregion
@@ -24,8 +24,13 @@
         #region Public Methods
         public void PlayCountdown()
         {
-            StopCoroutine(playCountdown);
-            StartCoroutine(playCountdown);
+            if (playCountdownCoroutine != null)
+            {
+                StopCoroutine(playCountdownCoroutine);
+            }
+
+            playCountdownCoroutine = PlayCountdownCoroutine();
+            StartCoroutine(playCountdownCoroutine);
         }
         #endregion
 
@@ -33,7 +38,6 @@
         private void Awake()
         {
             gameManager = MonoBehaviour.FindObjectOfType<GameManager>();
-            playCountdown = PlayCountdownCoroutine();
         }
 
         private IEnumerator PlayCountdownCoroutine()

@@ -33,6 +33,11 @@
 
         private bool anyKeyHasBeenPressed = false;
 
+        private IEnumerator transitionOutCoroutine;
+        private IEnumerator prepareToStartAudioAndTimerCoroutine;
+        private IEnumerator checkToStartGameCoroutine;
+        private IEnumerator startGameCoroutine;
+
         private MenuAudioManager menuAudioManager;
         private MenuTimeManager menuTimeManager;
         private Transition transition;
@@ -42,6 +47,7 @@
         #region Public Methods
         public void TransitionIn()
         {
+            startupScreen.gameObject.SetActive(true);
             PrepareToStartAudioAndTimer();
             PlayStartCanvasGroupTween();
             transition.PlayFadeInTween();
@@ -50,7 +56,13 @@
 
         public void TransitionOut()
         {
+            if (transitionOutCoroutine != null)
+            {
+                StopCoroutine(transitionOutCoroutine);
+            }
 
+            transitionOutCoroutine = TransitionOutCoroutine();
+            StartCoroutine(transitionOutCoroutine);
         }
 
         public void PlayTitleRhythmTween()
@@ -85,6 +97,14 @@
             SetTitleTextTransforms();
         }
 
+        private IEnumerator TransitionOutCoroutine()
+        {
+            transition.PlayFadeOutTween();
+            yield return new WaitForSeconds(Transition.TransitionDuration);
+            startupScreen.gameObject.SetActive(false);
+            yield return null;
+        }
+
         private void SetTitleTextTransforms()
         {
             titleTextCachedTransform = titleText.transform;
@@ -93,8 +113,13 @@
 
         private void PrepareToStartAudioAndTimer()
         {
-            StopCoroutine("PrepareToStartAudioAndTimerCoroutine");
-            StartCoroutine(PrepareToStartAudioAndTimerCoroutine());
+            if (prepareToStartAudioAndTimerCoroutine != null)
+            {
+                StopCoroutine(prepareToStartAudioAndTimerCoroutine);
+            }
+
+            prepareToStartAudioAndTimerCoroutine = PrepareToStartAudioAndTimerCoroutine();
+            StartCoroutine(prepareToStartAudioAndTimerCoroutine);
         }
 
         private IEnumerator PrepareToStartAudioAndTimerCoroutine()
@@ -124,8 +149,13 @@
 
         private void CheckToStartGame()
         {
-            StopCoroutine("CheckToStartGameCoroutine");
-            StartCoroutine(CheckToStartGameCoroutine());
+            if (checkToStartGameCoroutine != null)
+            {
+                StopCoroutine(checkToStartGameCoroutine);
+            }
+
+            checkToStartGameCoroutine = CheckToStartGameCoroutine();
+            StartCoroutine(checkToStartGameCoroutine);
         }
 
         private IEnumerator CheckToStartGameCoroutine()
@@ -144,8 +174,13 @@
 
         private void StartGame()
         {
-            StopCoroutine("StartGameCoroutine");
-            StartCoroutine(StartGameCoroutine());
+            if (startGameCoroutine != null)
+            {
+                StopCoroutine(startGameCoroutine);
+            }
+
+            startGameCoroutine = StartGameCoroutine();
+            StartCoroutine(startGameCoroutine);
         }
 
         private IEnumerator StartGameCoroutine()

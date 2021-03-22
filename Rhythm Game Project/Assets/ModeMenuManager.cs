@@ -4,16 +4,16 @@
     using UnityEngine;
     using UnityEngine.UI;
     using TMPro;
-    
+    using SceneLoading;
+
     public sealed class ModeMenuManager : MonoBehaviour, IMenu
     {
         #region Constants
-        private readonly string[] ModeTextStringArray = new string[] { "welcome", "mode select", "quickplay", "editor",
+        private readonly string[] ModeTextStringArray = new string[] { "welcome", "quickplay", "editor",
             "download", "rankings", "settings", "profile", "exit" };
         private readonly string[] ModeDescriptionTextStringArray = new string[]
             {
               "return to the title screen",
-              "select a mode",
               "play the rhythm game, complete against others on user created maps",
               "create your own map of your favorite song for others to play",
               "download more maps",
@@ -40,6 +40,9 @@
 
         [SerializeField] private CanvasGroup flashCanvasGroup = default;
 
+        private IEnumerator checkModeMenuInputCoroutine;
+
+        private Transition transition;
         private ColorCollection colorCollection;
         private TopCanvasManager topCanvasManager;
         private MenuManager menuManager;
@@ -50,18 +53,16 @@
         {
             modePanel.gameObject.SetActive(true);
             topCanvasManager.EnableModeButtonTriggers();
-            topCanvasManager.Button_Click(MenuManager.ModeMenuIndex);
-            Hover_Button(MenuManager.ModeMenuIndex);
+            Hover_Button(MenuManager.StartMenuIndex);
             CheckModeMenuInput();
         }
 
         public void TransitionOut()
         {
-            modePanel.gameObject.SetActive(false);
             topCanvasManager.DisableModeButtonTriggers();
             StopCheckModeMenuInputCoroutine();
+            modePanel.gameObject.SetActive(false);
         }
-
         public void Hover_Button(int _modeButtonIndex)
         {
             PlayHoverButtonTween(_modeButtonIndex);
@@ -70,12 +71,14 @@
             SetModeDescriptionColor(_modeButtonIndex);
             PlayModeTextTween();
             SetPreviousModeBackgroundImage(_modeButtonIndex);
+            menuManager.SetCurrentHoverMenuIndex(_modeButtonIndex);
         }
         #endregion
 
         #region Private Methods
         private void Awake()
         {
+            transition = FindObjectOfType<Transition>();
             colorCollection = FindObjectOfType<ColorCollection>();
             topCanvasManager = FindObjectOfType<TopCanvasManager>();
             menuManager = FindObjectOfType<MenuManager>();
@@ -126,7 +129,7 @@
 
         private void SetModeDescriptionColor(int _modeButtonIndex)
         {
-            // { "title", "mode", "quickplay", "editor", "download", "rankings", "settings", "profile", "exit" };
+            // { "title", "quickplay", "editor", "download", "rankings", "settings", "profile", "exit" };
             switch (_modeButtonIndex)
             {
                 case 0:
@@ -142,7 +145,7 @@
                     modeDescriptionColorImage.color = colorCollection.LightGreenColor080;
                     break;
                 case 4:
-                    modeDescriptionColorImage.color = colorCollection.WhiteColor080;
+                    modeDescriptionColorImage.color = colorCollection.PurpleColor080;
                     break;
                 case 5:
                     modeDescriptionColorImage.color = colorCollection.YellowColor080;
@@ -151,9 +154,6 @@
                     modeDescriptionColorImage.color = colorCollection.LightBlueColor080;
                     break;
                 case 7:
-                    modeDescriptionColorImage.color = colorCollection.PurpleColor080;
-                    break;
-                case 8:
                     modeDescriptionColorImage.color = colorCollection.RedColor080;
                     break;
             }
@@ -170,8 +170,13 @@
 
         private void CheckModeMenuInput()
         {
-            StopCheckModeMenuInputCoroutine();
-            StartCoroutine(CheckModeMenuInputCoroutine());
+            if (checkModeMenuInputCoroutine != null)
+            {
+                StopCoroutine(checkModeMenuInputCoroutine);
+            }
+
+            checkModeMenuInputCoroutine = CheckModeMenuInputCoroutine();
+            StartCoroutine(checkModeMenuInputCoroutine);
         }
 
         private void StopCheckModeMenuInputCoroutine()
@@ -187,29 +192,29 @@
                 {
                     if (Input.GetKeyDown(KeyCode.LeftArrow))
                     {
-                        if ((menuManager.CurrentMenuIndex - 1) < MenuManager.StartMenuIndex)
+                        if ((menuManager.CurrentHoverMenuIndex - 1) < MenuManager.StartMenuIndex)
                         {
-                            Hover_Button(MenuManager.ExitMenuIndex);
                             topCanvasManager.Button_Click(MenuManager.ExitMenuIndex);
+                            Hover_Button(MenuManager.ExitMenuIndex);
                         }
                         else
                         {
-                            Hover_Button(menuManager.CurrentMenuIndex - 1);
-                            topCanvasManager.Button_Click(menuManager.CurrentMenuIndex - 1);
+                            topCanvasManager.Button_Click(menuManager.CurrentHoverMenuIndex - 1);
+                            Hover_Button(menuManager.CurrentHoverMenuIndex - 1);
                         }
                     }
 
                     if (Input.GetKeyDown(KeyCode.RightArrow))
                     {
-                        if ((menuManager.CurrentMenuIndex + 1) > MenuManager.ExitMenuIndex)
+                        if ((menuManager.CurrentHoverMenuIndex + 1) > MenuManager.ExitMenuIndex)
                         {
-                            Hover_Button(MenuManager.StartMenuIndex);
                             topCanvasManager.Button_Click(MenuManager.StartMenuIndex);
+                            Hover_Button(MenuManager.StartMenuIndex);
                         }
                         else
                         {
-                            Hover_Button(menuManager.CurrentMenuIndex + 1);
-                            topCanvasManager.Button_Click(menuManager.CurrentMenuIndex + 1);
+                            topCanvasManager.Button_Click(menuManager.CurrentHoverMenuIndex + 1);
+                            Hover_Button(menuManager.CurrentHoverMenuIndex + 1);
                         }
                     }
                 }

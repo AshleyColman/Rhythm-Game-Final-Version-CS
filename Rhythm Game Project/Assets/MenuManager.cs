@@ -3,23 +3,26 @@
     using UnityEngine;
     using System.Collections;
     using Settings;
+    using SceneLoading;
 
     public sealed class MenuManager : MonoBehaviour
     {
         #region Constants
         public const byte StartMenuIndex = 0;
-        public const byte ModeMenuIndex = 1;
-        public const byte QuickplayMenuIndex = 2;
+        public const byte QuickplayMenuIndex = 1;
         //public const byte EditorMenuIndex = 0;
         //public const byte DownloadMenuIndex = 0;
         //public const byte RankingsMenuIndex = 0;
         //public const byte SettingsMenuIndex = 0;
         //public const byte ProfileMenuIndex = 0;
-        public const byte ExitMenuIndex = 8;
+        public const byte ExitMenuIndex = 7;
         #endregion
 
         #region Private Fields
         private int currentMenuIndex = 0;
+        private int currentHoverMenuIndex = 0;
+
+        private IEnumerator transitionToMenuCoroutine;
 
         private IMenu currentMenuScript;
 
@@ -34,6 +37,7 @@
 
         #region Properties
         public int CurrentMenuIndex => currentMenuIndex;
+        public int CurrentHoverMenuIndex => currentHoverMenuIndex;
         #endregion
 
         #region Public Methods
@@ -103,33 +107,20 @@
             quickplayMenuManager.TransitionIn();
         }
 
-
-
         public void TransitionToMenu(int _menuIndex)
         {
-            if (currentMenuScript is null == false)
+            if (transitionToMenuCoroutine != null)
             {
-                currentMenuScript.TransitionOut();
+                StopCoroutine(transitionToMenuCoroutine);
             }
 
-            switch (_menuIndex)
-            {
-                case 0:
-                    startMenuManager.TransitionIn();
-                    UpdateCurrentMenuScript(startMenuManager);
-                    UpdateCurrentMenuIndex(StartMenuIndex);
-                    break;
-                case 1:
-                    modeMenuManager.TransitionIn();
-                    UpdateCurrentMenuScript(modeMenuManager);
-                    UpdateCurrentMenuIndex(ModeMenuIndex);
-                    break;
-                case 2:
-                    quickplayMenuManager.TransitionIn();
-                    UpdateCurrentMenuScript(quickplayMenuManager);
-                    UpdateCurrentMenuIndex(QuickplayMenuIndex);
-                    break;
-            }
+            transitionToMenuCoroutine = TransitionToMenuCoroutine(_menuIndex);
+            StartCoroutine(transitionToMenuCoroutine);
+        }
+
+        public void SetCurrentHoverMenuIndex(int _hoverMenuIndex)
+        {
+            currentHoverMenuIndex = _hoverMenuIndex;
         }
         #endregion
 
@@ -148,6 +139,34 @@
         private void Start()
         {
             TransitionToMenu(StartMenuIndex);
+        }
+
+        private IEnumerator TransitionToMenuCoroutine(int _menuIndex)
+        {
+            if (currentMenuScript is null == false)
+            {
+                currentMenuScript.TransitionOut();
+            }
+
+            yield return new WaitForSeconds(Transition.TransitionDuration);
+
+            switch (_menuIndex)
+            {
+                case 0:
+                    startMenuManager.TransitionIn();
+                    UpdateCurrentMenuScript(startMenuManager);
+                    UpdateCurrentMenuIndex(StartMenuIndex);
+                    break;
+                case 1:
+                    quickplayMenuManager.TransitionIn();
+                    UpdateCurrentMenuScript(quickplayMenuManager);
+                    UpdateCurrentMenuIndex(QuickplayMenuIndex);
+                    break;
+            }
+
+            topCanvasManager.UpdateControlDescriptionText(currentMenuIndex);
+
+            yield return null;
         }
 
         private void UpdateCurrentMenuScript(IMenu _menuScript)

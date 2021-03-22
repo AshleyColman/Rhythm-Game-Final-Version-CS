@@ -54,6 +54,8 @@
         private bool activated = false;
         private bool canActivate = false;
 
+        private IEnumerator trackActivatedTimeCoroutine;
+
         private FlashManager flashManager;
         private MultiplierManager multiplierManager;
         #endregion
@@ -106,8 +108,13 @@
 
         private void TrackActivatedTime()
         {
-            StopCoroutine("TrackActivatedTimeCoroutine");
-            StartCoroutine(TrackActivatedTimeCoroutine());
+            if (trackActivatedTimeCoroutine != null)
+            {
+                StopCoroutine(trackActivatedTimeCoroutine);
+            }
+
+            trackActivatedTimeCoroutine = TrackActivatedTimeCoroutine();
+            StartCoroutine(trackActivatedTimeCoroutine);
         }
 
         private IEnumerator TrackActivatedTimeCoroutine()

@@ -28,6 +28,8 @@
 
         private byte multiplier = 1;
         private byte highestMultiplier = 0;
+
+        private IEnumerator playDeactivateTweenCoroutine;
         #endregion
 
         #region Properties
@@ -74,8 +76,13 @@
 
         private void PlayDeactivatedTween()
         {
-            StopCoroutine("PlayDeactivateTweenCoroutine");
-            StartCoroutine(PlayDeactivateTweenCoroutine());
+            if (playDeactivateTweenCoroutine != null)
+            {
+                StopCoroutine(playDeactivateTweenCoroutine);
+            }
+
+            playDeactivateTweenCoroutine = PlayDeactivateTweenCoroutine();
+            StartCoroutine(playDeactivateTweenCoroutine);
         }
 
         private IEnumerator PlayDeactivateTweenCoroutine()

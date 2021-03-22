@@ -26,6 +26,9 @@ namespace Gameplay
         private StringBuilder healthTextStringBuilder = new StringBuilder();
 
         private bool hasFailed = false;
+
+        private IEnumerator drainHealthCoroutine;
+        private IEnumerator growHealthCoroutine;
         #endregion
 
         #region Public Methods
@@ -40,8 +43,13 @@ namespace Gameplay
 
         public void GrowHealth()
         {
-            StopCoroutine("GrowHealthCoroutine");
-            StartCoroutine(GrowHealthCoroutine());
+            if (growHealthCoroutine != null)
+            {
+                StopCoroutine(growHealthCoroutine);
+            }
+
+            growHealthCoroutine = GrowHealthCoroutine();
+            StartCoroutine(growHealthCoroutine);
         }
         #endregion
 
@@ -76,8 +84,14 @@ namespace Gameplay
                 yield return null;
             }
 
-            StopCoroutine("DrainHealthCoroutine");
-            StartCoroutine(DrainHealthCoroutine());
+            if (drainHealthCoroutine != null)
+            {
+                StopCoroutine(drainHealthCoroutine);
+            }
+
+            drainHealthCoroutine = DrainHealthCoroutine();
+            StartCoroutine(drainHealthCoroutine);
+
             yield return null;
         }
 

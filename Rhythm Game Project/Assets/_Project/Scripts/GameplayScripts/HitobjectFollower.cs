@@ -20,6 +20,8 @@ namespace Gameplay
 
         private Vector3 targetPosition = Vector3.zero; // delete
 
+        private IEnumerator moveToPositionCoroutine;
+
         private HitobjectManager hitobjectManager;
         private GameManager gameManager;
         #endregion
@@ -32,8 +34,13 @@ namespace Gameplay
 
         public void TrackMoveToPosition()
         {
-            StopCoroutine("MoveToPositionCoroutine");
-            StartCoroutine(MoveToPositionCoroutine());
+            if (moveToPositionCoroutine != null)
+            {
+                StopCoroutine(moveToPositionCoroutine);
+            }
+
+            moveToPositionCoroutine = MoveToPositionCoroutine();
+            StartCoroutine(moveToPositionCoroutine);
         }
 
         public void PlayRhythmTween()

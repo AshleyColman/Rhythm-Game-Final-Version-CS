@@ -12,6 +12,9 @@
 
         [SerializeField] private Key[] keyArray = default;
 
+        private IEnumerator checkInputForGameplayCoroutine;
+        private IEnumerator checkInputToStartGameplayCoroutine;
+
         private GameManager gameManager;
         private HitobjectManager hitobjectManager;
         private Countdown countdown;
@@ -23,8 +26,13 @@
         #region Public Methods
         public void CheckInputForGameplay()
         {
-            StopCoroutine("CheckInputForGameplayCoroutine");
-            StartCoroutine(CheckInputForGameplayCoroutine());
+            if (checkInputForGameplayCoroutine != null)
+            {
+                StopCoroutine(checkInputForGameplayCoroutine);
+            }
+
+            checkInputForGameplayCoroutine = CheckInputForGameplayCoroutine();
+            StartCoroutine(checkInputForGameplayCoroutine);
         }
         #endregion
 
@@ -46,8 +54,13 @@
 
         private void CheckInputToStartGameplay()
         {
-            StopCoroutine("CheckInputToStartGameplayCoroutine");
-            StartCoroutine(CheckInputToStartGameplayCoroutine());
+            if (checkInputToStartGameplayCoroutine != null)
+            {
+                StopCoroutine(checkInputToStartGameplayCoroutine);
+            }
+
+            checkInputToStartGameplayCoroutine = CheckInputToStartGameplayCoroutine();
+            StartCoroutine(checkInputToStartGameplayCoroutine);
         }
 
         private IEnumerator CheckInputToStartGameplayCoroutine()
