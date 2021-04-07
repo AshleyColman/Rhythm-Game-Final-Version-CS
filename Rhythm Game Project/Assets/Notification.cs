@@ -77,13 +77,13 @@
                 case NotificationType.General:
                     colorImage.color = colorCollection.LightBlueColor080;
                     break;
-                case NotificationType.EasyDifficulty:
+                case NotificationType.TwoKey:
                     colorImage.color = colorCollection.DarkBlueColor080;
                     break;
-                case NotificationType.NormalDifficulty:
+                case NotificationType.FourKey:
                     colorImage.color = colorCollection.PurpleColor080;
                     break;
-                case NotificationType.HardDifficulty:
+                case NotificationType.SixKey:
                     colorImage.color = colorCollection.RedColor080;
                     break;
                 default:

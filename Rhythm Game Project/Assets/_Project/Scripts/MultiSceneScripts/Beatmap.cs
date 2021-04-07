@@ -16,6 +16,10 @@ public sealed class Beatmap
 
     private byte[] objectTypeArray;
     private byte totalKeys;
+    private byte approachRate;
+    private byte objectSize;
+    private byte healthDrain;
+    private byte timingWindow;
 
     private ushort totalObjects;
     private ushort totalPhrases;
@@ -32,7 +36,6 @@ public sealed class Beatmap
     private string creatorMessage;
     private string databaseTable;
     private string songLength;
-    private string level;
     private string playerDifficultyGrade;
     private string playerDifficultyGradeUsername;
 
@@ -53,6 +56,10 @@ public sealed class Beatmap
 
     public byte[] ObjectTypeArray { get => objectTypeArray; set => objectTypeArray = value; }
     public byte TotalKeys { get => totalKeys; set => totalKeys = value; }
+    public byte ApproachRate { get => approachRate; set => approachRate = value; }
+    public byte ObjectSize { get => objectSize; set => objectSize = value; }
+    public byte HealthDrain { get => healthDrain; set => healthDrain = value; }
+    public byte TimingWindow { get => timingWindow; set => timingWindow = value; }
 
     public ushort TotalObjects { get => totalObjects; set => totalObjects = value; }
     public ushort TotalFeverPhrases { get => totalPhrases; set => totalPhrases = value; }
@@ -62,7 +69,6 @@ public sealed class Beatmap
 
     public bool[] HasTypeArray { get => hasTypeArray; set => hasTypeArray = value; }
 
-    public string Level { get => level; set => level = value; }
     public string SongName { get => songName; set => songName = value; }
     public string ArtistName { get => artistName; set => artistName = value; }
     public string Genre { get => genre; set => genre = value; }

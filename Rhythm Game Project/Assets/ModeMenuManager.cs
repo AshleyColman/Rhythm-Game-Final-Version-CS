@@ -14,10 +14,10 @@
         private readonly string[] ModeDescriptionTextStringArray = new string[]
             {
               "return to the title screen",
-              "play the rhythm game, complete against others on user created maps",
-              "create your own map of your favorite song for others to play",
+              "play",
+              "create your own map",
               "download more maps",
-              "view how you stand against other players overall and on individual maps",
+              "view game rankings",
               "configure settings",
               "view your profile and stats",
               "thanks for playing!" };
@@ -27,10 +27,8 @@
         [SerializeField] private GameObject modePanel = default;
 
         [SerializeField] private TextMeshProUGUI modeText = default;
-        [SerializeField] private TextMeshProUGUI modeDescriptionText = default;
 
         [SerializeField] private Image[] modeBackgroundImageArray = default;
-        [SerializeField] private Image modeDescriptionColorImage = default;
         private Image previousModeBackgroundImage;
 
         private Transform[] modeBackgroundImageCachedTransformArray;
@@ -46,6 +44,7 @@
         private ColorCollection colorCollection;
         private TopCanvasManager topCanvasManager;
         private MenuManager menuManager;
+        private DescriptionPanel descriptionPanel;
         #endregion
 
         #region Public Methods
@@ -63,15 +62,29 @@
             StopCheckModeMenuInputCoroutine();
             modePanel.gameObject.SetActive(false);
         }
+
+        public void OnTick()
+        {
+
+        }
+
+        public void OnMeasure()
+        {
+
+        }
+
         public void Hover_Button(int _modeButtonIndex)
         {
-            PlayHoverButtonTween(_modeButtonIndex);
-            SetModeText(_modeButtonIndex);
-            SetModeDescriptionText(_modeButtonIndex);
-            SetModeDescriptionColor(_modeButtonIndex);
-            PlayModeTextTween();
-            SetPreviousModeBackgroundImage(_modeButtonIndex);
-            menuManager.SetCurrentHoverMenuIndex(_modeButtonIndex);
+            if (modePanel.gameObject.activeSelf == true)
+            {
+                PlayHoverButtonTween(_modeButtonIndex);
+                SetModeText(_modeButtonIndex);
+                descriptionPanel.SetSingleDescription(ModeDescriptionTextStringArray[_modeButtonIndex],
+                    GetModeDescriptionColor(_modeButtonIndex));
+                PlayModeTextTween();
+                SetPreviousModeBackgroundImage(_modeButtonIndex);
+                menuManager.SetCurrentHoverMenuIndex(_modeButtonIndex);
+            }
         }
         #endregion
 
@@ -82,6 +95,7 @@
             colorCollection = FindObjectOfType<ColorCollection>();
             topCanvasManager = FindObjectOfType<TopCanvasManager>();
             menuManager = FindObjectOfType<MenuManager>();
+            descriptionPanel = FindObjectOfType<DescriptionPanel>();
             SetModeBackgroundImageCachedTransformArray();
             modeTextCachedTransform = modeText.transform;
             defaultModeTextPosition = modeTextCachedTransform.localPosition;
@@ -117,45 +131,34 @@
             modeText.SetText(ModeTextStringArray[_modeButtonIndex]);
         }
 
-        private void SetModeDescriptionText(int _modeButtonIndex)
-        {
-            modeDescriptionText.SetText(ModeDescriptionTextStringArray[_modeButtonIndex]);
-        }
-        
         private void SetPreviousModeBackgroundImage(int _modeButtonIndex)
         {
             previousModeBackgroundImage = modeBackgroundImageArray[_modeButtonIndex];
         }
 
-        private void SetModeDescriptionColor(int _modeButtonIndex)
+        private Color32 GetModeDescriptionColor(int _modeButtonIndex)
         {
             // { "title", "quickplay", "editor", "download", "rankings", "settings", "profile", "exit" };
             switch (_modeButtonIndex)
             {
                 case 0:
-                    modeDescriptionColorImage.color = colorCollection.DarkBlueColor080;
-                    break;
+                    return colorCollection.DarkBlueColor080;
                 case 1:
-                    modeDescriptionColorImage.color = colorCollection.PinkColor080;
-                    break;
+                    return colorCollection.PinkColor080;
                 case 2:
-                    modeDescriptionColorImage.color = colorCollection.OrangeColor080;
-                    break;
+                    return colorCollection.OrangeColor080;
                 case 3:
-                    modeDescriptionColorImage.color = colorCollection.LightGreenColor080;
-                    break;
+                    return colorCollection.LightGreenColor080;
                 case 4:
-                    modeDescriptionColorImage.color = colorCollection.PurpleColor080;
-                    break;
+                    return colorCollection.PurpleColor080;
                 case 5:
-                    modeDescriptionColorImage.color = colorCollection.YellowColor080;
-                    break;
+                    return colorCollection.YellowColor080;
                 case 6:
-                    modeDescriptionColorImage.color = colorCollection.LightBlueColor080;
-                    break;
+                    return colorCollection.LightBlueColor080;
                 case 7:
-                    modeDescriptionColorImage.color = colorCollection.RedColor080;
-                    break;
+                    return colorCollection.RedColor080;
+                default:
+                    return colorCollection.WhiteColor080;
             }
         }
 

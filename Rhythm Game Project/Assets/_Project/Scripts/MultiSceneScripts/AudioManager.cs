@@ -55,14 +55,15 @@
             userInterfaceAudioSource.PlayOneShot(userInterfaceAudioClipArray[_clipIndex], userInterfaceAudioSourceVolume);
         }
 
-        public void LoadSongAudioClipFromFile(string _beatmapFolderPath, float _audioStartTime)
+        public void LoadSongAudioClipFromFile(string _beatmapFolderPath, float _audioStartTime, TimeManager timeManager)
         {
             if (loadSongAudioClipFromFileCoroutine != null)
             {
                 StopCoroutine(loadSongAudioClipFromFileCoroutine);
             }
 
-            loadSongAudioClipFromFileCoroutine = LoadSongAudioClipFromFileCoroutine(_beatmapFolderPath, _audioStartTime);
+            loadSongAudioClipFromFileCoroutine = LoadSongAudioClipFromFileCoroutine(_beatmapFolderPath, _audioStartTime,
+                timeManager);
             StartCoroutine(loadSongAudioClipFromFileCoroutine);
         }
         #endregion
@@ -76,10 +77,12 @@
             userInterfaceAudioSource.volume = userInterfaceAudioSourceVolume;
         }
 
-        private IEnumerator LoadSongAudioClipFromFileCoroutine(string _beatmapFolderPath, float _audioStartTime)
+        private IEnumerator LoadSongAudioClipFromFileCoroutine(string _beatmapFolderPath, float _audioStartTime, 
+            TimeManager _timeManager)
         {
             DeactivateSongAudioSource();
             UnloadSongAudioClip();
+            _timeManager.StopTimer();
 
             if (string.IsNullOrEmpty(_beatmapFolderPath) == false)
             {
@@ -106,6 +109,8 @@
                             ActivateSongAudioSource();
                             PlayScheduledSongAudio(AudioClipLoadDelayDuration);
                             SetAudioStartTime(_audioStartTime);
+                            yield return new WaitForSeconds(AudioClipLoadDelayDuration);
+                            _timeManager.RecalculateAndPlayFromNewPosition();
                             hasLoadedAudioFile = true;
                         }
                     }

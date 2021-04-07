@@ -7,8 +7,8 @@
     public sealed class MenuTimeManager : TimeManager
     {
         #region Private Fields
+        private MenuManager menuManager;
         private BackgroundManager backgroundManager;
-        private StartMenuManager startMenuManager;
         private FlashManager flashManager;
         #endregion
 
@@ -25,22 +25,24 @@
         {
             base.Awake();
 
+            menuManager = FindObjectOfType<MenuManager>();
             backgroundManager = FindObjectOfType<BackgroundManager>();
-            startMenuManager = FindObjectOfType<StartMenuManager>();
             flashManager = FindObjectOfType<FlashManager>();
         }
 
         protected override void OnTick()
         {
             base.OnTick();
+
+            menuManager.PlayCurrentMenuOnTick();
         }
 
         protected override void OnMeasure()
         {
             base.OnMeasure();
             backgroundManager.PlayRhythmScaleTween();
-            startMenuManager.PlayTitleRhythmTween();
             flashManager.PlayFlashTween(1f);
+            menuManager.PlayCurrentMenuOnMeasure();
         }
         #endregion
     }

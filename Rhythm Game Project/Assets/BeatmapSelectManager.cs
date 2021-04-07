@@ -50,6 +50,7 @@
         private MenuAudioManager menuAudioManager;
         private Notification notification;
         private BackgroundManager backgroundManager;
+        private MenuTimeManager menuTimeManager;
         #endregion
 
         #region Properties
@@ -72,6 +73,16 @@
         public void TransitionOut()
         {
             beatmapSelectScreen.gameObject.SetActive(false);
+        }
+
+        public void OnTick()
+        {
+
+        }
+
+        public void OnMeasure()
+        {
+
         }
 
         public void OpenDirectory()
@@ -131,7 +142,7 @@
             menuAudioManager = FindObjectOfType<MenuAudioManager>();
             notification = FindObjectOfType<Notification>();
             backgroundManager = FindObjectOfType<BackgroundManager>();
-            //InstantiateBeatmapButtons();
+            menuTimeManager = FindObjectOfType<MenuTimeManager>();
         }
             
         private IEnumerator TransitionInCoroutine()
@@ -151,7 +162,8 @@
             currentBeatmapPreviewIndex = _beatmapButtonIndex;
             backgroundManager.TransitionAndLoadNewImage(_imageTexture);
             SetSongSlider(_beatmapButtonIndex);
-            menuAudioManager.LoadSongAudioClipFromFile($"{fileManager.BeatmapDirectories[_beatmapButtonIndex]}", _audioStartTime);
+            menuAudioManager.LoadSongAudioClipFromFile($"{fileManager.BeatmapDirectories[_beatmapButtonIndex]}", _audioStartTime,
+                menuTimeManager);
 
             yield return waitForSeconds;
 
@@ -231,13 +243,13 @@
 
         private void LoadDifficultyInformation(int _index)
         {
-            string easyFilePath = $"{fileManager.BeatmapDirectories[_index]}/{FileTypes.EasyFileType}";
-            string normalFilePath = $"{fileManager.BeatmapDirectories[_index]}/{FileTypes.NormalFileType}";
-            string hardFilePath = $"{fileManager.BeatmapDirectories[_index]}/{FileTypes.HardFileType}";
+            string twoKeyFilePath = $"{fileManager.BeatmapDirectories[_index]}/{FileTypes.TwoKeyFileType}";
+            string fourKeyFilePath = $"{fileManager.BeatmapDirectories[_index]}/{FileTypes.FourKeyFileType}";
+            string sixKeyFilePath = $"{fileManager.BeatmapDirectories[_index]}/{FileTypes.SixKeyFileType}";
 
-            LoadDifficultyFile(_index, Difficulty.Easy, easyFilePath);
-            LoadDifficultyFile(_index, Difficulty.Normal, normalFilePath);
-            LoadDifficultyFile(_index, Difficulty.Hard, hardFilePath);
+            LoadDifficultyFile(_index, Difficulty.TwoKey, twoKeyFilePath);
+            LoadDifficultyFile(_index, Difficulty.FourKey, fourKeyFilePath);
+            LoadDifficultyFile(_index, Difficulty.SixKey, sixKeyFilePath);
 
             beatmapButtonList[_index].CalculateDifficultyMasteryAccuracy();
         }
@@ -270,8 +282,6 @@
             {
                 beatmapButtonList[_index].SetDifficultyGradeFalse(_difficulty);
             }
-
-            beatmapButtonList[_index].SetDifficultyLevelButton(_difficulty, true, fileManager.Beatmap.Level);
         }
 
         private void ActivateAllButtons()

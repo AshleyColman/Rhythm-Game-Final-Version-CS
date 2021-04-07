@@ -42,6 +42,7 @@
         private MenuTimeManager menuTimeManager;
         private Transition transition;
         private MenuManager menuManager;
+        private ModeMenuManager modeMenuManager;
         #endregion
 
         #region Public Methods
@@ -65,18 +66,14 @@
             StartCoroutine(transitionOutCoroutine);
         }
 
-        public void PlayTitleRhythmTween()
+        public void OnTick()
         {
-            if (startupScreen.gameObject.activeSelf == true)
-            {
-                LeanTween.cancel(titleText.gameObject);
-                LeanTween.cancel(titleEffectText.gameObject);
-                titleTextCachedTransform.localScale = Vector3.one;
-                titleEffectTextCachedTransform.localScale = Vector3.one;
 
-                LeanTween.scale(titleText.gameObject, titleScaleTo, 1f).setEasePunch();
-                LeanTween.scale(titleEffectText.gameObject, titleEffectScaleTo, 1f).setEasePunch();
-            }
+        }
+
+        public void OnMeasure()
+        {
+            PlayTitleRhythmTween();
         }
 
         public void TransitionOutStartAndAccountPanel()
@@ -92,9 +89,21 @@
             menuTimeManager = FindObjectOfType<MenuTimeManager>();
             transition = FindObjectOfType<Transition>();
             menuManager = FindObjectOfType<MenuManager>();
+            modeMenuManager = FindObjectOfType<ModeMenuManager>();
             menuTimeManager.SetTimingDetails(StartSongBeatsPerMinute, StartSongOffsetMilliseconds);
             menuTimeManager.UpdateTimingPosition();
             SetTitleTextTransforms();
+        }
+
+        private void PlayTitleRhythmTween()
+        {
+            LeanTween.cancel(titleText.gameObject);
+            LeanTween.cancel(titleEffectText.gameObject);
+            titleTextCachedTransform.localScale = Vector3.one;
+            titleEffectTextCachedTransform.localScale = Vector3.one;
+
+            LeanTween.scale(titleText.gameObject, titleScaleTo, 1f).setEasePunch();
+            LeanTween.scale(titleEffectText.gameObject, titleEffectScaleTo, 1f).setEasePunch();
         }
 
         private IEnumerator TransitionOutCoroutine()
@@ -102,6 +111,7 @@
             transition.PlayFadeOutTween();
             yield return new WaitForSeconds(Transition.TransitionDuration);
             startupScreen.gameObject.SetActive(false);
+            modeMenuManager.TransitionOut();
             yield return null;
         }
 

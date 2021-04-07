@@ -41,6 +41,16 @@
         #endregion
 
         #region Public Methods
+        public void PlayCurrentMenuOnTick()
+        {
+            currentMenuScript.OnTick();
+        }
+
+        public void PlayCurrentMenuOnMeasure()
+        {
+            currentMenuScript.OnMeasure();
+        }
+
         // ACCOUNT (needs changing)
         public void TransitionStartMenuToAccountPanel()
         {

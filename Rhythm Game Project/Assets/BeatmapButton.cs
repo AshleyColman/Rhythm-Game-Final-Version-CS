@@ -13,9 +13,9 @@
 
         private int buttonIndex = 0;
 
-        private float easyDifficultyAccuracy = 0f;
-        private float normalDifficultyAccuracy = 0f;
-        private float hardDifficultyAccuracy = 0f;
+        private float twoKeyDifficultyAccuracy = 0f;
+        private float fourKeyDifficultyAccuracy = 0f;
+        private float sixKeyDifficultyAccuracy = 0f;
         private float difficultyMasterAccuracy = 0f;
 
         private float audioStartTime = 0f;
@@ -28,19 +28,16 @@
         [SerializeField] private TextMeshProUGUI dateText = default;
         [SerializeField] private TextMeshProUGUI numberText = default;
         [SerializeField] private TextMeshProUGUI difficultyMasteryText = default;
-        [SerializeField] private TextMeshProUGUI easyDifficultyLevelText = default;
-        [SerializeField] private TextMeshProUGUI normalDifficultyLevelText = default;
-        [SerializeField] private TextMeshProUGUI hardDifficultyLevelText = default;
-        [SerializeField] private TextMeshProUGUI easyDifficultyGradeText = default;
-        [SerializeField] private TextMeshProUGUI normalDifficultyGradeText = default;
-        [SerializeField] private TextMeshProUGUI hardDifficultyGradeText = default;
-        [SerializeField] private TextMeshProUGUI easyDifficultyAccuracyText = default;
-        [SerializeField] private TextMeshProUGUI normalDifficultyAccuracyText = default;
-        [SerializeField] private TextMeshProUGUI hardDifficultyAccuracyText = default;
+        [SerializeField] private TextMeshProUGUI twoKeyDifficultyGradeText = default;
+        [SerializeField] private TextMeshProUGUI fourKeyDifficultyGradeText = default;
+        [SerializeField] private TextMeshProUGUI sixKeyDifficultyGradeText = default;
+        [SerializeField] private TextMeshProUGUI twoKeyDifficultyAccuracyText = default;
+        [SerializeField] private TextMeshProUGUI fourKeyDifficultyAccuracyText = default;
+        [SerializeField] private TextMeshProUGUI sixKeyDifficultyAccuracyText = default;
 
-        [SerializeField] private Button easyDifficultyButton = default;
-        [SerializeField] private Button normalDifficultyButton = default;
-        [SerializeField] private Button hardDifficultyButton = default;
+        [SerializeField] private Button twoKeyDifficultyButton = default;
+        [SerializeField] private Button fourKeyDifficultyButton = default;
+        [SerializeField] private Button sixKeyDifficultyButton = default;
 
         private BeatmapSelectManager beatmapSelectManager = default;
         private BeatmapOverviewManager beatmapOverviewManager = default;
@@ -70,42 +67,26 @@
         {
             switch (_difficulty)
             {
-                case Difficulty.Easy:
-                    easyDifficultyAccuracyText.SetText($"{_accuracy}%");
-                    easyDifficultyAccuracy = _accuracy;
-                    easyDifficultyGradeText.SetText(_grade);
-                    easyDifficultyGradeText.colorGradientPreset = _gradeColor;
+                case Difficulty.TwoKey:
+                    twoKeyDifficultyButton.interactable = true;
+                    twoKeyDifficultyAccuracyText.SetText($"{_accuracy}%");
+                    twoKeyDifficultyAccuracy = _accuracy;
+                    twoKeyDifficultyGradeText.SetText(_grade);
+                    twoKeyDifficultyGradeText.colorGradientPreset = _gradeColor;
                     break;
-                case Difficulty.Normal:
-                    normalDifficultyAccuracyText.SetText($"{_accuracy}%");
-                    normalDifficultyAccuracy = _accuracy;
-                    normalDifficultyGradeText.SetText(_grade);
-                    normalDifficultyGradeText.colorGradientPreset = _gradeColor;
+                case Difficulty.FourKey:
+                    fourKeyDifficultyButton.interactable = true;
+                    fourKeyDifficultyAccuracyText.SetText($"{_accuracy}%");
+                    fourKeyDifficultyAccuracy = _accuracy;
+                    fourKeyDifficultyGradeText.SetText(_grade);
+                    fourKeyDifficultyGradeText.colorGradientPreset = _gradeColor;
                     break;
-                case Difficulty.Hard:
-                    hardDifficultyAccuracyText.SetText($"{_accuracy}%");
-                    hardDifficultyAccuracy = _accuracy;
-                    hardDifficultyGradeText.SetText(_grade);
-                    hardDifficultyGradeText.colorGradientPreset = _gradeColor;
-                    break;
-            }
-        }
-
-        public void SetDifficultyLevelButton(Difficulty _difficulty, bool _fileExists, string _level)
-        {
-            switch (_difficulty)
-            {
-                case Difficulty.Easy:
-                    easyDifficultyButton.interactable = _fileExists;
-                    easyDifficultyLevelText.SetText(_level);
-                    break;
-                case Difficulty.Normal:
-                    normalDifficultyButton.interactable = _fileExists;
-                    normalDifficultyLevelText.SetText(_level);
-                    break;
-                case Difficulty.Hard:
-                    hardDifficultyButton.interactable = _fileExists;
-                    hardDifficultyLevelText.SetText(_level);
+                case Difficulty.SixKey:
+                    sixKeyDifficultyButton.interactable = true;
+                    sixKeyDifficultyAccuracyText.SetText($"{_accuracy}%");
+                    sixKeyDifficultyAccuracy = _accuracy;
+                    sixKeyDifficultyGradeText.SetText(_grade);
+                    sixKeyDifficultyGradeText.colorGradientPreset = _gradeColor;
                     break;
             }
         }
@@ -114,33 +95,35 @@
         {
             switch (_difficulty)
             {
-                case Difficulty.Easy:
-                    easyDifficultyButton.interactable = false;
-                    easyDifficultyAccuracyText.SetText("0%");
-                    easyDifficultyAccuracy = 0f;
-                    easyDifficultyGradeText.SetText("x");
-                    easyDifficultyGradeText.color = Color.white;
+                case Difficulty.TwoKey:
+                    twoKeyDifficultyButton.interactable = false;
+                    twoKeyDifficultyAccuracyText.SetText("0%");
+                    twoKeyDifficultyAccuracy = 0f;
+                    twoKeyDifficultyGradeText.SetText("x");
+                    twoKeyDifficultyGradeText.color = Color.white;
                     break;
-                case Difficulty.Normal:
-                    normalDifficultyButton.interactable = false;
-                    normalDifficultyAccuracyText.SetText("0%");
-                    normalDifficultyAccuracy = 0f;
-                    normalDifficultyGradeText.SetText("x");
-                    normalDifficultyGradeText.color = Color.white;
+                case Difficulty.FourKey:
+                    fourKeyDifficultyButton.interactable = false;
+                    fourKeyDifficultyAccuracyText.SetText("0%");
+                    fourKeyDifficultyAccuracy = 0f;
+                    fourKeyDifficultyGradeText.SetText("x");
+                    fourKeyDifficultyGradeText.color = Color.white;
                     break;
-                case Difficulty.Hard:
-                    hardDifficultyButton.interactable = false;
-                    hardDifficultyAccuracyText.SetText("0%");
-                    hardDifficultyAccuracy = 0f;
-                    hardDifficultyGradeText.SetText("x");
-                    hardDifficultyGradeText.color = Color.white;
+                case Difficulty.SixKey:
+                    sixKeyDifficultyButton.interactable = false;
+                    sixKeyDifficultyAccuracyText.SetText("0%");
+                    sixKeyDifficultyAccuracy = 0f;
+                    sixKeyDifficultyGradeText.SetText("x");
+                    sixKeyDifficultyGradeText.color = Color.white;
                     break;
             }
         }
 
         public void CalculateDifficultyMasteryAccuracy()
         {
-            float[] difficultyAccuracyArray = new float[] { easyDifficultyAccuracy, normalDifficultyAccuracy, hardDifficultyAccuracy };
+            float[] difficultyAccuracyArray = new float[] { twoKeyDifficultyAccuracy, fourKeyDifficultyAccuracy,
+                sixKeyDifficultyAccuracy };
+
             int totalIncrements = 0;
 
             for (byte i = 0; i < difficultyAccuracyArray.Length; i++)
@@ -175,36 +158,21 @@
         public void Button_OnClick()
         {
             quickplayMenuManager.TransitionToMenu(QuickplayMenuManager.BeatmapOverviewMenuIndex);
-            beatmapOverviewManager.LoadBeatmap(buttonIndex, Difficulty.Easy, beatmapImage.mainTexture); // Difficulty passed for testing.
-        }
-
-        public string GetDifficultyLevelString(Difficulty _difficulty)
-        {
-            switch (_difficulty)
-            {
-                case Difficulty.Easy:
-                    return easyDifficultyLevelText.text;
-                case Difficulty.Normal:
-                    return normalDifficultyLevelText.text;
-                case Difficulty.Hard:
-                    return hardDifficultyLevelText.text;
-                default:
-                    return String.Empty;
-            }
+            beatmapOverviewManager.LoadBeatmap(buttonIndex, Difficulty.TwoKey, beatmapImage.mainTexture); // Difficulty passed for testing.
         }
 
         public TextMeshProUGUI GetDifficultyGradeText(Difficulty _difficulty)
         {
             switch (_difficulty)
             {
-                case Difficulty.Easy:
-                    return easyDifficultyGradeText;
-                case Difficulty.Normal:
-                    return normalDifficultyGradeText;
-                case Difficulty.Hard:
-                    return hardDifficultyGradeText;
+                case Difficulty.TwoKey:
+                    return twoKeyDifficultyGradeText;
+                case Difficulty.FourKey:
+                    return fourKeyDifficultyGradeText;
+                case Difficulty.SixKey:
+                    return sixKeyDifficultyGradeText;
                 default:
-                    return easyDifficultyGradeText;
+                    return twoKeyDifficultyGradeText;
             }
         }
         #endregion

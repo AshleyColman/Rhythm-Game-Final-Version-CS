@@ -37,7 +37,11 @@
         {
             beatmapDirectoryPath = $"{Application.persistentDataPath}/Beatmaps";
             SetBeatmapDirectories();
-            CreateNewBeatmapFileTest();
+
+
+            CreateTwoKeyBeatmap();
+            CreateFourKeyBeatmap();
+            CreateSixKeyBeatmap();
         }
 
         private void SetBeatmapDirectories()
@@ -45,39 +49,127 @@
             beatmapDirectories = Directory.GetDirectories(beatmapDirectoryPath);
         }
 
-        private void CreateNewBeatmapFileTest()
+        private void CreateTwoKeyBeatmap()
         {
             beatmap = new Beatmap();
 
-            string folderName = "Magical";
+            string folderName = "WhitePeak";
             string beatmapFolder = "Beatmaps";
-            string difficultyFile = "hard.bm";
+            string difficultyFile = FileTypes.TwoKeyFileType;
             string filePath = $"{Application.persistentDataPath}/{beatmapFolder}/{folderName}/{difficultyFile}";
 
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             Stream stream = new FileStream(filePath, FileMode.Create);
 
-            beatmap.SongName = "Really really really really really really really long name for testing";
-            beatmap.ArtistName = "Unknown artist name";
+            beatmap.SongName = "White Peak";
+            beatmap.ArtistName = "XI";
             beatmap.CreatorName = "Ashley";
-            beatmap.Genre = "Hardcore";
-            beatmap.Difficulty = Difficulty.Hard;
+            beatmap.Genre = "Happy Hardcore";
+            beatmap.Difficulty = Difficulty.TwoKey;
             beatmap.PlayerDifficultyGrade = "S";
             beatmap.PlayerDifficultyGradeUsername = "Ashley";
-            beatmap.CreatorMessage = "Hard difficulty???";
-            beatmap.TotalObjects = 1005;
-            beatmap.TotalFeverPhrases = 20;
+            beatmap.CreatorMessage = "Two key difficulty created by me!";
+            beatmap.TotalObjects = 500;
+            beatmap.TotalFeverPhrases = 5;
             beatmap.AudioStartTime = 25f;
-            beatmap.BeatsPerMinute = 125f;
+            beatmap.BeatsPerMinute = 200f;
             beatmap.OffsetMilliseconds = 0;
-            beatmap.DifficultyAccuracy = 54;
+            beatmap.DifficultyAccuracy = 98.5f;
+            beatmap.TotalKeys = 2;
+            beatmap.SongLength = "2 minutes 30 seconds";
+            beatmap.CreatedDate = DateTime.Now;
+            beatmap.DatabaseTable = "testTable";
+            beatmap.HasTypeArray = new bool[1];
+            beatmap.HasTypeArray[0] = true;
+
+            beatmap.ApproachRate = 10;
+            beatmap.ObjectSize = 10;
+            beatmap.HealthDrain = 10;
+            beatmap.TimingWindow = 10;
+
+            binaryFormatter.Serialize(stream, beatmap);
+            stream.Close();
+        }
+
+        private void CreateFourKeyBeatmap()
+        {
+            beatmap = new Beatmap();
+
+            string folderName = "WhitePeak";
+            string beatmapFolder = "Beatmaps";
+            string difficultyFile = FileTypes.FourKeyFileType;
+            string filePath = $"{Application.persistentDataPath}/{beatmapFolder}/{folderName}/{difficultyFile}";
+
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            Stream stream = new FileStream(filePath, FileMode.Create);
+
+            beatmap.SongName = "White Peak";
+            beatmap.ArtistName = "XI";
+            beatmap.CreatorName = "Ashley";
+            beatmap.Genre = "Happy Hardcore";
+            beatmap.Difficulty = Difficulty.TwoKey;
+            beatmap.PlayerDifficultyGrade = "A";
+            beatmap.PlayerDifficultyGradeUsername = "Ashley";
+            beatmap.CreatorMessage = "Four key difficulty created by me!";
+            beatmap.TotalObjects = 1000;
+            beatmap.TotalFeverPhrases = 10;
+            beatmap.AudioStartTime = 50f;
+            beatmap.BeatsPerMinute = 200f;
+            beatmap.OffsetMilliseconds = 0;
+            beatmap.DifficultyAccuracy = 90.5f;
             beatmap.TotalKeys = 4;
             beatmap.SongLength = "2 minutes 30 seconds";
             beatmap.CreatedDate = DateTime.Now;
             beatmap.DatabaseTable = "testTable";
-            beatmap.Level = "9";
             beatmap.HasTypeArray = new bool[1];
             beatmap.HasTypeArray[0] = true;
+
+            beatmap.ApproachRate = 5;
+            beatmap.ObjectSize = 3;
+            beatmap.HealthDrain = 5;
+            beatmap.TimingWindow = 5;
+
+            binaryFormatter.Serialize(stream, beatmap);
+            stream.Close();
+        }
+
+        private void CreateSixKeyBeatmap()
+        {
+            beatmap = new Beatmap();
+
+            string folderName = "WhitePeak";
+            string beatmapFolder = "Beatmaps";
+            string difficultyFile = FileTypes.SixKeyFileType;
+            string filePath = $"{Application.persistentDataPath}/{beatmapFolder}/{folderName}/{difficultyFile}";
+
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            Stream stream = new FileStream(filePath, FileMode.Create);
+
+            beatmap.SongName = "White Peak";
+            beatmap.ArtistName = "XI";
+            beatmap.CreatorName = "Ashley";
+            beatmap.Genre = "Happy Hardcore";
+            beatmap.Difficulty = Difficulty.SixKey;
+            beatmap.PlayerDifficultyGrade = "E";
+            beatmap.PlayerDifficultyGradeUsername = "Ashley";
+            beatmap.CreatorMessage = "Four key difficulty created by me!";
+            beatmap.TotalObjects = 2000;
+            beatmap.TotalFeverPhrases = 20;
+            beatmap.AudioStartTime =75f;
+            beatmap.BeatsPerMinute = 200f;
+            beatmap.OffsetMilliseconds = 0;
+            beatmap.DifficultyAccuracy = 35.28f;
+            beatmap.TotalKeys = 6;
+            beatmap.SongLength = "2 minutes 30 seconds";
+            beatmap.CreatedDate = DateTime.Now;
+            beatmap.DatabaseTable = "testTable";
+            beatmap.HasTypeArray = new bool[1];
+            beatmap.HasTypeArray[0] = true;
+
+            beatmap.ApproachRate = 8;
+            beatmap.ObjectSize = 4;
+            beatmap.HealthDrain = 9;
+            beatmap.TimingWindow = 8;
 
             binaryFormatter.Serialize(stream, beatmap);
             stream.Close();

@@ -19,11 +19,13 @@
 
         private BeatmapOverviewManager beatmapOverviewManager;
         private BeatmapSelectManager beatmapSelectManager;
+        private DescriptionPanel descriptionPanel;
         #endregion
 
         #region Public Methods
         public void TransitionIn()
         {
+            descriptionPanel.PlayDefaultDescriptionArr();
             quickplayScreen.gameObject.SetActive(true);
             beatmapSelectManager.TransitionIn();
             UpdateCurrentMenuScript(beatmapSelectManager);
@@ -33,6 +35,16 @@
         public void TransitionOut()
         {
             // Transition out current active menu           
+        }
+
+        public void OnTick()
+        {
+            currentMenuScript.OnTick();
+        }
+
+        public void OnMeasure()
+        {
+            currentMenuScript.OnMeasure();
         }
 
         public void TransitionToMenu(int _menuIndex)
@@ -63,6 +75,7 @@
         {
             beatmapOverviewManager = FindObjectOfType<BeatmapOverviewManager>();
             beatmapSelectManager = FindObjectOfType<BeatmapSelectManager>();
+            descriptionPanel = FindObjectOfType<DescriptionPanel>();
         }
 
         private void UpdateCurrentMenuScript(IMenu _menuScript)

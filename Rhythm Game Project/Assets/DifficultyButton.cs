@@ -9,44 +9,35 @@
     public sealed class DifficultyButton : MonoBehaviour
     {
         #region Constants
-        private readonly Vector3 textScaleTo = new Vector3(1.25f, 1.25f, 1f);
-
-        private const byte defaultTextSize = 75;
-        private const byte selectedTextSize = 100;
+        private readonly Vector3 gradeTextScaleTo = new Vector3(1.25f, 1.25f, 1f);
+        private readonly Vector3 gradeEffectTextScaleTo = new Vector3(1.75f, 1.75f, 1f);
         #endregion
 
         #region Private Fields
-        [SerializeField] private TextMeshProUGUI levelText = default;
+        [SerializeField] private TextMeshProUGUI difficultyText = default;
         [SerializeField] private TextMeshProUGUI gradeText = default;
+        [SerializeField] private TextMeshProUGUI gradeEffectText = default;
+        [SerializeField] private TextMeshProUGUI accuracyText = default;
+
+        [SerializeField] private CanvasGroup flashCanvasGroup = default;
 
         [SerializeField] private Button button = default;
 
-        [SerializeField] private Image glowImage = default;
-
-        [SerializeField] private CanvasGroup glowImageCanvasGroup = default;
-        [SerializeField] private CanvasGroup gradeCanvasGroup = default;
-        [SerializeField] private CanvasGroup levelCanvasGroup = default;
-
         [SerializeField] private Difficulty difficulty = default;
 
-        private IEnumerator playLevelAndGradeAnimationCoroutine;
-
-        private Transform levelTextCachedTransform;
-        private Transform gradeTextCachedTransform;
+        private Transform gradeTextCachedTransform = default;
+        private Transform gradeEffectTextCachedTransform = default;
 
         private BeatmapOverviewManager beatmapOverviewManager;
         #endregion
 
         #region Public Methods
-        public void SetLevelText(string _text)
-        {
-            levelText.SetText(_text);
-        }
-
         public void SetGradeText(TextMeshProUGUI _text)
         {
             gradeText.text = _text.text;
+            gradeEffectText.text = _text.text;
             gradeText.colorGradientPreset = _text.colorGradientPreset;
+            gradeEffectText.colorGradientPreset = _text.colorGradientPreset;
         }
 
         public void Button_OnClick()
@@ -56,7 +47,7 @@
 
         public void SelectButton()
         {
-            PlaySelectedAnimation();
+            
         }
 
         public void DisableButton()
@@ -67,12 +58,17 @@
         public void ActivateButton()
         {
             button.interactable = true;
-            PlayLevelAndGradeAnimation();
         }
 
         public void UnselectButton()
         {
-            StopSelectAnimation();
+
+        }
+
+        public void PlaySelectedBeatAnimation()
+        {
+            PlayGradeTextAnimation();
+            PlayFlashAnimation();
         }
         #endregion
 
@@ -81,83 +77,28 @@
         {
             beatmapOverviewManager = FindObjectOfType<BeatmapOverviewManager>();
 
-            levelTextCachedTransform = levelText.transform;
             gradeTextCachedTransform = gradeText.transform;
+            gradeEffectTextCachedTransform = gradeEffectText.transform;
         }
 
-        private void PlaySelectedAnimation()
+        private void PlayFlashAnimation()
         {
-            levelText.fontSize = selectedTextSize;
-            gradeText.fontSize = selectedTextSize;
+            flashCanvasGroup.alpha = 0f;
+            LeanTween.cancel(flashCanvasGroup.gameObject);
 
-            glowImageCanvasGroup.alpha = 0f;
-            glowImageCanvasGroup.gameObject.SetActive(true);
-
-            LeanTween.alphaCanvas(glowImageCanvasGroup, 1f, 0.10f).setLoopPingPong(-1);
-            LeanTween.scale(levelText.gameObject, textScaleTo, 0.10f).setLoopPingPong(-1);
-            LeanTween.scale(gradeText.gameObject, textScaleTo, 0.10f).setLoopPingPong(-1);
+            LeanTween.alphaCanvas(flashCanvasGroup, 1f, 1f).setEasePunch();
         }
 
-        private void StopSelectAnimation()
+        private void PlayGradeTextAnimation()
         {
-            levelText.fontSize = defaultTextSize;
-            gradeText.fontSize = defaultTextSize;
-
-            glowImageCanvasGroup.alpha = 0f;
-            levelTextCachedTransform.localScale = Vector3.one;
             gradeTextCachedTransform.localScale = Vector3.one;
-            LeanTween.cancel(glowImageCanvasGroup.gameObject);
-            LeanTween.cancel(levelText.gameObject);
+            gradeEffectTextCachedTransform.localScale = Vector3.one;
             LeanTween.cancel(gradeText.gameObject);
+            LeanTween.cancel(gradeEffectText.gameObject);
 
-            glowImageCanvasGroup.gameObject.SetActive(false);
-        }
-
-        private void PlayLevelAndGradeAnimation()
-        {
-            if (playLevelAndGradeAnimationCoroutine != null)
-            {
-                StopCoroutine(playLevelAndGradeAnimationCoroutine);
-            }
-
-            playLevelAndGradeAnimationCoroutine = PlayLevelAndGradeAnimationCoroutine();
-            StartCoroutine(playLevelAndGradeAnimationCoroutine);
-        }
-
-        private IEnumerator PlayLevelAndGradeAnimationCoroutine()
-        {
-            WaitForSeconds fadeDelay = new WaitForSeconds(1f);
-            WaitForSeconds visibleDelay = new WaitForSeconds(3f);
-
-            while (this.gameObject.activeSelf == true)
-            {
-                gradeCanvasGroup.alpha = 0f;
-                levelCanvasGroup.alpha = 1f;
-                LeanTween.cancel(gradeCanvasGroup.gameObject);
-                LeanTween.cancel(levelCanvasGroup.gameObject);
-
-                LeanTween.alphaCanvas(levelCanvasGroup, 0f, 1f);
-
-                yield return fadeDelay;
-
-                LeanTween.alphaCanvas(gradeCanvasGroup, 1f, 1f);
-
-                yield return visibleDelay;
-
-                LeanTween.alphaCanvas(gradeCanvasGroup, 0f, 1f);
-
-                yield return fadeDelay;
-
-                LeanTween.alphaCanvas(levelCanvasGroup, 1f, 1f);
-
-                yield return visibleDelay;
-
-                yield return null;
-            }
-
-            yield return null;
+            LeanTween.scale(gradeText.gameObject, gradeTextScaleTo, 1f).setEasePunch();
+            LeanTween.scale(gradeEffectText.gameObject, gradeEffectTextScaleTo, 1f).setEasePunch();
         }
         #endregion
     }
-
 }

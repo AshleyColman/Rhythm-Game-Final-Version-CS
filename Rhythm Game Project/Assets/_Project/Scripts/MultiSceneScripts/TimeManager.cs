@@ -45,6 +45,20 @@
             timerStarted = true;
         }
 
+        public void StopTimer()
+        {
+            timerStarted = false;
+        }
+
+        public void RecalculateAndPlayFromNewPosition()
+        {
+            UpdateSongTime();
+            StartTimer();
+            CalculateIntervals();
+            SetClosestTickAndMeasure();
+            SetStepBasedOnCurrentAudioTime();
+        }
+
         public void UpdateTimingPosition()
         {
             CalculateIntervals();
@@ -70,7 +84,8 @@
 
         protected void UpdateSongTime()
         {
-            songTime = AudioSettings.dspTime - audioManager.SongAudioStartTime;
+            //songTime = AudioSettings.dspTime - audioManager.SongAudioStartTime;
+            songTime = audioManager.SongAudioSource.time;
         }
 
         protected void UpdateMetronomeValues()
