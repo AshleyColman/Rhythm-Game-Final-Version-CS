@@ -107,7 +107,7 @@
             beatmap.ArtistName = "XI";
             beatmap.CreatorName = "Ashley";
             beatmap.Genre = "Happy Hardcore";
-            beatmap.Difficulty = Difficulty.TwoKey;
+            beatmap.Difficulty = Difficulty.FourKey;
             beatmap.PlayerDifficultyGrade = "A";
             beatmap.PlayerDifficultyGradeUsername = "Ashley";
             beatmap.CreatorMessage = "Four key difficulty created by me!";

@@ -17,7 +17,6 @@
         private float fourKeyDifficultyAccuracy = 0f;
         private float sixKeyDifficultyAccuracy = 0f;
         private float difficultyMasterAccuracy = 0f;
-
         private float audioStartTime = 0f;
 
         [SerializeField] private Image beatmapImage = default;
@@ -46,6 +45,7 @@
 
         #region Properties
         public Image BeatmapImage => beatmapImage;
+        public float DifficultyMasterAccuracy => difficultyMasterAccuracy;
         #endregion
 
         #region Public Methods
@@ -124,25 +124,7 @@
             float[] difficultyAccuracyArray = new float[] { twoKeyDifficultyAccuracy, fourKeyDifficultyAccuracy,
                 sixKeyDifficultyAccuracy };
 
-            int totalIncrements = 0;
-
-            for (byte i = 0; i < difficultyAccuracyArray.Length; i++)
-            {
-                if (difficultyAccuracyArray[i] != 0)
-                {
-                    difficultyMasterAccuracy += difficultyAccuracyArray[i];
-                    totalIncrements++;
-                }
-            }
-
-            if (totalIncrements == 0)
-            {
-                difficultyMasterAccuracy = 0f;
-            }
-            else
-            {
-                difficultyMasterAccuracy = ((difficultyMasterAccuracy / (totalIncrements * 100) * 100));
-            }
+            difficultyMasterAccuracy = UtilityMethods.GetAverageFromNumberArr(difficultyAccuracyArray);
 
             difficultyMasteryText.SetText($"{difficultyMasterAccuracy.ToString("F2")}%");
         }
@@ -158,9 +140,14 @@
         public void Button_OnClick()
         {
             quickplayMenuManager.TransitionToMenu(QuickplayMenuManager.BeatmapOverviewMenuIndex);
-            beatmapOverviewManager.LoadBeatmap(buttonIndex, Difficulty.TwoKey, beatmapImage.mainTexture); // Difficulty passed for testing.
+            LoadBeatmap();
         }
 
+        public void LoadBeatmap()
+        {
+            beatmapOverviewManager.LoadBeatmap(buttonIndex, Difficulty.TwoKey, beatmapImage.mainTexture);
+        }
+        
         public TextMeshProUGUI GetDifficultyGradeText(Difficulty _difficulty)
         {
             switch (_difficulty)

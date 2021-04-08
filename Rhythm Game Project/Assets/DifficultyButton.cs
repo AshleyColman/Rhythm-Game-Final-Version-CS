@@ -47,22 +47,12 @@
 
         public void SelectButton()
         {
-            
-        }
-
-        public void DisableButton()
-        {
             button.interactable = false;
-        }
-
-        public void ActivateButton()
-        {
-            button.interactable = true;
         }
 
         public void UnselectButton()
         {
-
+            button.interactable = true;
         }
 
         public void PlaySelectedBeatAnimation()

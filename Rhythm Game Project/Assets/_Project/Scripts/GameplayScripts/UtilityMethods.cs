@@ -79,5 +79,29 @@ public static class UtilityMethods
         return percentage;
     }
 
+    public static float GetAverageFromNumberArr(float[] _numberArr)
+    {
+        int totalIncrements = 0;
+        float average = 0f;
 
+        for (int i = 0; i < _numberArr.Length; i++)
+        {
+            if (_numberArr[i] != 0)
+            {
+                average += _numberArr[i];
+                totalIncrements++;
+            }
+        }
+
+        if (totalIncrements == 0)
+        {
+            average = 0f;
+        }
+        else
+        {
+            average = ((average / (totalIncrements * 100) * 100));
+        }
+
+        return average;
+    }
 }

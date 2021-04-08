@@ -9,19 +9,30 @@
         #region Private Fields
         [SerializeField] private Button button = default;
 
+        [SerializeField] private Image colorImage = default;
+
         [SerializeField] private TextMeshProUGUI text = default;
         #endregion
-
-        #region Properties
-
-        #endregion
-
         #region Public Methods
+        public void SetColorImageColor(Color32 _color)
+        {
+            colorImage.color = _color;
+        }
 
-        #endregion
+        public void SetText(string _text)
+        {
+            text.SetText(_text);
+        }
 
-        #region Private Methods
+        public void DisableInteractableButton()
+        {
+            button.interactable = false;
+        }
 
+        public void EnableInteractableButton()
+        {
+            button.interactable = true;
+        }
         #endregion
     }
 }

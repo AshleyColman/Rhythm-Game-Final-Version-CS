@@ -78,7 +78,7 @@
                     colorImage.color = colorCollection.LightBlueColor080;
                     break;
                 case NotificationType.TwoKey:
-                    colorImage.color = colorCollection.DarkBlueColor080;
+                    colorImage.color = colorCollection.YellowColor080;
                     break;
                 case NotificationType.FourKey:
                     colorImage.color = colorCollection.PurpleColor080;

@@ -59,6 +59,14 @@
             PlayDescriptionArrayLoop();
         }
 
+        public void SetPanelColor(Color32 _color)
+        {
+            if (colorImage.color != _color)
+            {
+                colorImage.color = _color;
+            }
+        }
+
         public void SetSingleDescription(string _text, Color32 _color)
         {
             descriptionText.SetText(_text);
@@ -73,14 +81,6 @@
             animationEndPosition = descriptionText.transform.localPosition;
             animationStartPosition = new Vector3(animationEndPosition.x, animationEndPosition.y - 50f, animationEndPosition.z);
             descriptionTextCachedTransform = descriptionText.transform;
-        }
-
-        private void SetPanelColor(Color32 _color)
-        {
-            if (colorImage.color != _color)
-            {
-                colorImage.color = _color;
-            }
         }
 
         private void ClearDescriptionArr()
