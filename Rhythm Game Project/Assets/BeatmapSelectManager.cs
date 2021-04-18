@@ -101,6 +101,18 @@
             StartCoroutine(loadBeatmapPreviewCoroutine);
         }
 
+        public void OverviewLoadBeatmapPreview(int _beatmapButtonIndex, float _audioStartTime, Texture _imageTexture)
+        {
+            if (loadBeatmapPreviewCoroutine != null)
+            {
+                StopCoroutine(loadBeatmapPreviewCoroutine);
+            }
+
+            loadBeatmapPreviewCoroutine = LoadBeatmapPreviewCoroutine(_beatmapButtonIndex, _audioStartTime, _imageTexture);
+
+            StartCoroutine(loadBeatmapPreviewCoroutine);
+        }
+
         public void PreviewPreviousBeatmapButton()
         {
             if (beatmapButtonList.Count != 0)

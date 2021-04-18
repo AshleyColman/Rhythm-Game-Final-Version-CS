@@ -9,9 +9,6 @@
     {
         #region Constants
         private const byte DefaultMultiplier = 1;
-        private const byte FeverMultiplier = 2;
-
-        private const string FeverMultiplierString = "X2";
 
         private readonly Vector3 MultiplierScaleTo = new Vector3(1.25f, 1.25f, 1f);
         private readonly Vector3 MultiplierEffectScaleTo = new Vector3(1.75f, 1.75f, 1f);
@@ -30,6 +27,8 @@
         private byte highestMultiplier = 0;
 
         private IEnumerator playDeactivateTweenCoroutine;
+
+        private ColorCollection colorCollection;
         #endregion
 
         #region Properties
@@ -37,11 +36,21 @@
         #endregion
 
         #region Public Methods
+        public void ResetMultiplier()
+        {
+            multiplier = 1;
+        }
+
+        public void IncrementMultiplier()
+        {
+            multiplier++;
+        }
+
         public void ActivateFeverMultiplier()
         {
-            multiplierText.SetText(FeverMultiplierString);
-            multiplierEffectText.SetText(FeverMultiplierString);
-            multiplier = FeverMultiplier;
+            multiplierText.SetText($"x{multiplier}");
+            multiplierEffectText.SetText(multiplier.ToString());
+            SetMultiplierColor();
             PlayActivatedTween();
             CheckIfHighest();
         }
@@ -54,6 +63,11 @@
         #endregion
 
         #region Private Methods
+        private void Awake()
+        {
+            colorCollection = FindObjectOfType<ColorCollection>();
+        }
+
         private void CheckIfHighest()
         {
             if (multiplier > highestMultiplier)
@@ -83,6 +97,28 @@
 
             playDeactivateTweenCoroutine = PlayDeactivateTweenCoroutine();
             StartCoroutine(playDeactivateTweenCoroutine);
+        }
+
+        private void SetMultiplierColor()
+        {
+            switch(multiplier)
+            {
+                case 1:
+                    multiplierText.color = colorCollection.YellowColor;
+                    break;
+                case 2:
+                    multiplierText.color = colorCollection.DarkBlueColor;
+                    break;
+                case 3:
+                    multiplierText.color = colorCollection.OrangeColor;
+                    break;
+                case 4:
+                    multiplierText.color = colorCollection.PurpleColor;
+                    break;
+                default:
+                    multiplierText.color = colorCollection.WhiteColor;
+                    break;
+            }
         }
 
         private IEnumerator PlayDeactivateTweenCoroutine()

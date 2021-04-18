@@ -38,6 +38,17 @@
             displayNotificationCoroutine = DisplayNotificationCoroutine(_notificationType, _text, _duration);
             StartCoroutine(displayNotificationCoroutine);
         }
+
+        public void DisplayNotification(Color32 _color, string _text, float _duration)
+        {
+            if (displayNotificationCoroutine != null)
+            {
+                StopCoroutine(displayNotificationCoroutine);
+            }
+
+            displayNotificationCoroutine = DisplayNotificationCoroutine(_color, _text, _duration);
+            StartCoroutine(displayNotificationCoroutine);
+        }
         #endregion
 
         #region Private Methods
@@ -65,6 +76,16 @@
             yield return null;
         }
 
+        private IEnumerator DisplayNotificationCoroutine(Color32 _color, string _text, float _duration)
+        {
+            text.SetText(_text);
+            colorImage.color = _color;
+            TransitionIn();
+            yield return new WaitForSeconds(_duration);
+            TransitionOut();
+            yield return null;
+        }
+
         private void SetNotificationColor(NotificationType _notificationType)
         {
             TryReference();
@@ -76,15 +97,6 @@
                     break;
                 case NotificationType.General:
                     colorImage.color = colorCollection.LightBlueColor080;
-                    break;
-                case NotificationType.TwoKey:
-                    colorImage.color = colorCollection.YellowColor080;
-                    break;
-                case NotificationType.FourKey:
-                    colorImage.color = colorCollection.PurpleColor080;
-                    break;
-                case NotificationType.SixKey:
-                    colorImage.color = colorCollection.RedColor080;
                     break;
                 default:
                     colorImage.color = colorCollection.WhiteColor080;

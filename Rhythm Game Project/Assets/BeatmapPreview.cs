@@ -12,6 +12,10 @@
         [SerializeField] private SongSliderProgressText songSlider = default;
         #endregion
 
+        #region Properties
+        public SongSliderProgressText SongSlider => songSlider;
+        #endregion
+
         #region Public Methods
         public void SetBackgroundImage(Texture _imageTexture)
         {

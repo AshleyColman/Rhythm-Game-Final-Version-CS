@@ -132,6 +132,11 @@
                 {
                     if (Input.GetKey(keyArray[i].KeyCode))
                     {
+                        keyArray[i].PlayOnKeyAnimation();
+                    }
+
+                    if (Input.GetKeyDown(keyArray[i].KeyCode))
+                    {
                         keyArray[i].PlayOnKeyDownAnimation();
                     }
                 }

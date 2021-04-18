@@ -18,7 +18,7 @@ namespace Gameplay
         #endregion
 
         #region Private Fields
-        [SerializeField] private UnityEngine.Object osuMapFile = default;
+        [SerializeField] private DefaultAsset osuMapFile = default;
 
         [SerializeField] private Transform spawnTransform = default;
 
@@ -65,7 +65,7 @@ namespace Gameplay
             List<Vector2> positionList = new List<Vector2>();
             List<double> spawnTimeList = new List<double>();
 
-            string osuMapFilePath = "";//AssetDatabase.GetAssetPath(osuMapFile);
+            string osuMapFilePath = AssetDatabase.GetAssetPath(osuMapFile);
 
             StreamReader reader = new StreamReader(osuMapFilePath);
 

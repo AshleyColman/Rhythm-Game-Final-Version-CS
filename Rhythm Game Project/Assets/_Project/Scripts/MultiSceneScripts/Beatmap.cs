@@ -28,6 +28,11 @@ public sealed class Beatmap
     private int localBeatmapID;
 
     private bool[] hasTypeArray;
+    private bool standardClear;
+    private bool hiddenClear;
+    private bool minesClear;
+    private bool fullCombo;
+    private bool maxPercentage;
 
     private string songName;
     private string artistName;
@@ -68,6 +73,11 @@ public sealed class Beatmap
     public int LocalBeatmapID { get => localBeatmapID; set => localBeatmapID = value; }
 
     public bool[] HasTypeArray { get => hasTypeArray; set => hasTypeArray = value; }
+    public bool StandardClear { get => standardClear; set => standardClear = value; }
+    public bool HiddenClear { get => hiddenClear; set => hiddenClear = value; }
+    public bool MinesClear { get => minesClear; set => minesClear = value; }
+    public bool FullCombo { get => fullCombo; set => fullCombo = value; }
+    public bool MaxPercentage { get => maxPercentage; set => maxPercentage = value; }
 
     public string SongName { get => songName; set => songName = value; }
     public string ArtistName { get => artistName; set => artistName = value; }

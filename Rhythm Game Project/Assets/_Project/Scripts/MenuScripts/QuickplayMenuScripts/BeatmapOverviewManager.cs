@@ -7,6 +7,8 @@
     using System.Collections;
     using Enums;
     using TMPro;
+    using Audio;
+    using Background;
 
     public sealed class BeatmapOverviewManager : MonoBehaviour, IMenu
     {
@@ -26,10 +28,13 @@
         [SerializeField] private DifficultyButton fourKeyDifficultyButton = default;
         [SerializeField] private DifficultyButton sixKeyDifficultyButton = default;
 
+        [SerializeField] private ChallengeButtonPanel challengeButtonPanel = default;
+
         [SerializeField] private CustomButton keyModeButton = default;
 
         [SerializeField] private HorizontalTextScroller songTextScroller;
 
+        private IEnumerator loadBeatmapWithAudioAndImageCoroutine;
         private IEnumerator lerpDifficultyStatisticTextCoroutine;
         private IEnumerator checkMenuInputCoroutine;
 
@@ -45,6 +50,9 @@
         private TopCanvasManager topCanvasManager;
         private DescriptionPanel descriptionPanel;
         private ColorCollection colorCollection;
+        private MenuAudioManager menuAudioManager;
+        private MenuTimeManager menuTimeManager;
+        private BackgroundManager backgroundManager;
         #endregion
 
         #region Properties
@@ -123,7 +131,8 @@
 
                 UnselectCurrentDifficultyButton();
                 SelectBeatmapDifficulty();
-                
+
+                challengeButtonPanel.SetButtonVisuals();
                 // Load Leaderboard. 
                 // Update visuals.
 
@@ -142,6 +151,20 @@
             LoadBeatmap(_index, _difficulty);
             beatmapPreview.SetBackgroundImage(_imageTexture);
             beatmapPreview.ActivateSongSlider();
+        }
+
+        public void LoadBeatmapWithAudioAndImage(int _index, Difficulty _difficulty, Texture _imageTexture,
+            float _audioStartTime)
+        {
+            if (loadBeatmapWithAudioAndImageCoroutine != null)
+            {
+                StopCoroutine(loadBeatmapWithAudioAndImageCoroutine);
+            }
+
+            loadBeatmapWithAudioAndImageCoroutine = LoadBeatmapWithAudioAndImageCoroutine(_index, _difficulty, _imageTexture, 
+                _audioStartTime);
+
+            StartCoroutine(loadBeatmapWithAudioAndImageCoroutine);
         }
 
         public void Button_OnClick_SelectDifficultyTwoKey()
@@ -212,6 +235,9 @@
             topCanvasManager = FindObjectOfType<TopCanvasManager>();
             descriptionPanel = FindObjectOfType<DescriptionPanel>();
             colorCollection = FindObjectOfType<ColorCollection>();
+            menuAudioManager = FindObjectOfType<MenuAudioManager>();
+            menuTimeManager = FindObjectOfType<MenuTimeManager>();
+            backgroundManager = FindObjectOfType<BackgroundManager>();
         }
 
         private void SetSelectedButtonIndex(int _index)
@@ -226,21 +252,21 @@
                 case Difficulty.TwoKey:
                     twoKeyDifficultyButton.SelectButton();
                     selectedDifficulty = Difficulty.TwoKey;
-                    notification.DisplayNotification(NotificationType.TwoKey, "2K", 1f);
+                    notification.DisplayNotification(colorCollection.YellowColor080, "2K", 1f);
                     descriptionPanel.SetPanelColor(colorCollection.YellowColor080);
                     keyModeButton.SetColorImageColor(colorCollection.YellowColor);
                     break;
                 case Difficulty.FourKey:
                     fourKeyDifficultyButton.SelectButton();
                     selectedDifficulty = Difficulty.FourKey;
-                    notification.DisplayNotification(NotificationType.FourKey, "4K", 1f);
-                    descriptionPanel.SetPanelColor(colorCollection.PurpleColor080);
-                    keyModeButton.SetColorImageColor(colorCollection.PurpleColor);
+                    notification.DisplayNotification(colorCollection.PinkColor080, "4K", 1f);
+                    descriptionPanel.SetPanelColor(colorCollection.PinkColor080);
+                    keyModeButton.SetColorImageColor(colorCollection.PinkColor);
                     break;
                 case Difficulty.SixKey:
                     sixKeyDifficultyButton.SelectButton();
                     selectedDifficulty = Difficulty.SixKey;
-                    notification.DisplayNotification(NotificationType.SixKey, "6K", 1f);
+                    notification.DisplayNotification(colorCollection.RedColor080, "6K", 1f);
                     descriptionPanel.SetPanelColor(colorCollection.RedColor080);
                     keyModeButton.SetColorImageColor(colorCollection.RedColor);
                     break;
@@ -273,6 +299,31 @@
 
             gradeText = beatmapSelectManager.BeatmapButtonList[_index].GetDifficultyGradeText(Difficulty.SixKey);
             sixKeyDifficultyButton.SetGradeText(gradeText);
+        }
+
+        // Loads the beatmap with audio and image for the overview screen.
+        private IEnumerator LoadBeatmapWithAudioAndImageCoroutine(int _index, Difficulty _difficulty, Texture _imageTexture, 
+            float _audioStartTime)
+        {
+            WaitForSeconds waitForSeconds = new WaitForSeconds(MenuAudioManager.AudioClipLoadDelayDuration);
+
+            LoadBeatmap(_index, _difficulty);
+            backgroundManager.TransitionAndLoadNewImage(_imageTexture);
+            beatmapPreview.SetBackgroundImage(_imageTexture);
+            menuAudioManager.LoadSongAudioClipFromFile($"{fileManager.BeatmapDirectories[selectedButtonIndex]}", _audioStartTime,
+                menuTimeManager);
+
+            yield return waitForSeconds;
+
+            beatmapPreview.SongSlider.LerpSliderToValue(beatmapPreview.SongSlider.SongTimeSliderValue,
+                UtilityMethods.GetSliderValuePercentageFromTime(_audioStartTime, menuAudioManager.SongAudioSource.clip.length),
+                MenuAudioManager.AudioClipLoadDelayDuration);
+
+            yield return waitForSeconds;
+
+            beatmapPreview.ActivateSongSlider();
+
+            yield return null;
         }
 
         private void PlayDifficultyStatisticsAnimation()
@@ -356,13 +407,11 @@
                     if (Input.GetKeyDown(KeyCode.LeftArrow))
                     {
                         LoadPreviousBeatmap();
-                        Debug.Log(selectedButtonIndex);
                     }
 
                     if (Input.GetKeyDown(KeyCode.RightArrow))
                     {
                         LoadNextBeatmap();
-                        Debug.Log(selectedButtonIndex);
                     }
                 }
 
@@ -378,13 +427,12 @@
             {
                 if ((selectedButtonIndex + 1) < beatmapSelectManager.BeatmapButtonList.Count)
                 {
-                    beatmapSelectManager.BeatmapButtonList[selectedButtonIndex + 1].Button_OnHover();
-                    beatmapSelectManager.BeatmapButtonList[selectedButtonIndex + 1].LoadBeatmap();
+                    beatmapSelectManager.BeatmapButtonList[selectedButtonIndex + 1]
+                        .LoadBeatmapWithAudioAndImage(selectedDifficulty);
                 }
                 else
                 {
-                    beatmapSelectManager.BeatmapButtonList[0].Button_OnHover();
-                    beatmapSelectManager.BeatmapButtonList[0].LoadBeatmap();
+                    beatmapSelectManager.BeatmapButtonList[0].LoadBeatmapWithAudioAndImage(selectedDifficulty);
                 }
             }
         }
@@ -396,13 +444,13 @@
             {
                 if ((selectedButtonIndex - 1) < 0)
                 {
-                    beatmapSelectManager.BeatmapButtonList[beatmapSelectManager.BeatmapButtonList.Count - 1].Button_OnHover();
-                    beatmapSelectManager.BeatmapButtonList[beatmapSelectManager.BeatmapButtonList.Count - 1].LoadBeatmap();
+                    beatmapSelectManager.BeatmapButtonList[beatmapSelectManager.BeatmapButtonList.Count - 1]
+                        .LoadBeatmapWithAudioAndImage(selectedDifficulty);
                 }
                 else
                 {
-                    beatmapSelectManager.BeatmapButtonList[selectedButtonIndex - 1].Button_OnHover();
-                    beatmapSelectManager.BeatmapButtonList[selectedButtonIndex - 1].LoadBeatmap();
+                    beatmapSelectManager.BeatmapButtonList[selectedButtonIndex - 1]
+                        .LoadBeatmapWithAudioAndImage(selectedDifficulty);
                 }
             }
         }

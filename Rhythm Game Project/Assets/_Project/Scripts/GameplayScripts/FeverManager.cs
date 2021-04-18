@@ -16,7 +16,8 @@
         private const string FeverBackgroundAnimationString = "FeverBackground_Activated";
         private const string MaxDurationString = "MAX";
 
-        private readonly Vector3 scaleTo = new Vector3(1.25f, 1.25f, 1f);
+        private readonly Vector3 ScaleTo = new Vector3(1.25f, 1.25f, 1f);
+        private readonly Vector3 EffectScaleTo = new Vector3(1.75f, 1.75f, 1f);
         #endregion
 
         #region Private Fields
@@ -29,8 +30,10 @@
         [SerializeField] private Image sliderFillImage = default;
 
         [SerializeField] private CanvasGroup flashFillImageCanvasGroup = default;
+        [SerializeField] private CanvasGroup feverBackgroundCanvasGroup = default;
 
         [SerializeField] private TextMeshProUGUI durationText = default;
+        [SerializeField] private TextMeshProUGUI durationEffectText = default;
         [SerializeField] private TextMeshProUGUI[] phraseRequirementTextArray = default;
 
         [SerializeField] private Gradient gradient = default;
@@ -54,6 +57,10 @@
         private bool activated = false;
         private bool canActivate = false;
 
+        private Transform durationTextTransform;
+        private Transform durationEffectTextTransform;
+
+        private IEnumerator cancelActivatedTweenCoroutine;
         private IEnumerator trackActivatedTimeCoroutine;
 
         private FlashManager flashManager;
@@ -70,6 +77,7 @@
                     hit++;
                     feverSlider.value++;
                     UpdatePhraseDuration();
+                    PlayDurationTextAnimation();
                     CheckIfCanActivate();
                     CheckIfNextPhrase();
                     UpdateSliderColor();
@@ -91,8 +99,15 @@
         {
             flashManager = MonoBehaviour.FindObjectOfType<FlashManager>();
             multiplierManager = MonoBehaviour.FindObjectOfType<MultiplierManager>();
+            ReferenceTransforms();
             CalculateMeasureDuration();
             CalculateMaxPhraseDuration();
+        }
+
+        private void ReferenceTransforms()
+        {
+            durationTextTransform = durationText.transform;
+            durationEffectTextTransform = durationEffectText.transform;
         }
 
         private void UpdatePhraseDuration()
@@ -168,6 +183,7 @@
             flashManager.PlayFlashTween(5f);
             PlayActivatedTween();
             multiplierManager.ActivateFeverMultiplier();
+            durationEffectText.gameObject.SetActive(false);
         }
 
         private void DeactivateFever()
@@ -176,6 +192,7 @@
             canActivate = false;
             audioReverbFilter.enabled = false;
             activatedTimer = 0.0;
+            phraseDuration = 0f;
             feverSlider.value = 0f;
             hit = 0;
             currentPhrase = -1;
@@ -185,6 +202,8 @@
             ShowRequirementText();
             CancelActivatedTween();
             UpdateDurationText();
+            durationEffectText.gameObject.SetActive(true);
+            PlayDurationTextAnimation();
             multiplierManager.DeactivateFeverMultiplier();
         }
 
@@ -215,6 +234,7 @@
         {
             phraseDurationTextStringBuilder.Append(phraseDuration.ToString("F2"));
             durationText.SetText(phraseDurationTextStringBuilder.ToString());
+            durationEffectText.SetText(phraseDurationTextStringBuilder.ToString());
             phraseDurationTextStringBuilder.Clear();
         }
 
@@ -235,16 +255,35 @@
             LeanTween.cancel(flashFillImageCanvasGroup.gameObject);
             flashFillImageCanvasGroup.alpha = 0f;
             LeanTween.alphaCanvas(flashFillImageCanvasGroup, 0.5f, 1f).setLoopPingPong(-1);
+
+            FadeFeverBackgroundCanvasGroupIn();
         }
 
         private void PlayPhraseAchievedTween()
         {
-            LeanTween.scale(phraseRequirementTextArray[currentPhrase].gameObject, scaleTo, 1f).setEasePunch();
+            LeanTween.scale(phraseRequirementTextArray[currentPhrase].gameObject, ScaleTo, 1f).setEasePunch();
         }
 
         private void CancelActivatedTween()
         {
+            if (cancelActivatedTweenCoroutine != null)
+            {
+                StopCoroutine(cancelActivatedTweenCoroutine);
+            }
+
+            cancelActivatedTweenCoroutine = CancelActivatedTweenCoroutine();
+            StartCoroutine(cancelActivatedTweenCoroutine);
+        }
+
+        private IEnumerator CancelActivatedTweenCoroutine()
+        {
+            FadeFeverBackgroundCanvasGroupOut();
+
+            yield return new WaitForSeconds(0.5f);
+
             LeanTween.cancel(flashFillImageCanvasGroup.gameObject);
+
+            yield return null;
         }
 
         private void CheckIfNextPhrase()
@@ -295,6 +334,33 @@
             {
                 phraseRequirementTextArray[i].gameObject.SetActive(true);
             }
+        }
+
+        private void FadeFeverBackgroundCanvasGroupIn()
+        {
+            LeanTween.cancel(feverBackgroundCanvasGroup.gameObject);
+            feverBackgroundCanvasGroup.alpha = 0f;
+
+            LeanTween.alphaCanvas(feverBackgroundCanvasGroup, 0.1f, 0.5f).setEaseOutExpo();        }
+
+        private void FadeFeverBackgroundCanvasGroupOut()
+        {
+            LeanTween.cancel(feverBackgroundCanvasGroup.gameObject);
+            feverBackgroundCanvasGroup.alpha = 0.1f;
+
+            LeanTween.alphaCanvas(feverBackgroundCanvasGroup, 0f, 0.5f).setEaseOutExpo();
+        }
+
+        private void PlayDurationTextAnimation()
+        {
+            LeanTween.cancel(durationTextTransform.gameObject);
+            durationTextTransform.localScale = Vector3.one;
+
+            LeanTween.cancel(durationEffectTextTransform.gameObject);
+            durationEffectTextTransform.localScale = Vector3.one;
+
+            LeanTween.scale(durationTextTransform.gameObject, ScaleTo, 0.5f).setEasePunch();
+            LeanTween.scale(durationEffectTextTransform.gameObject, EffectScaleTo, 0.5f).setEasePunch();
         }
     }
     #endregion

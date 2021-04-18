@@ -5229,6 +5229,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   achievedColorImage: {fileID: 1740609748}
   lockedColorImage: {fileID: 1199522076}
+  notAchievedNotification: hit every hitobject to unlock!
+  hasAchievedNotification: congratulations! fullcombo challenge complete!
 --- !u!114 &102941625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5271,7 +5273,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1663610346}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 102941624}
+        m_TargetAssemblyTypeName: Menu.BeatmapChallengeButton, Assembly-CSharp
+        m_MethodName: Button_OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &105115758
 GameObject:
   m_ObjectHideFlags: 0
@@ -9505,7 +9519,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &185354884
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13501,7 +13515,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &264914434
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13541,7 +13555,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ca30382b1404b8746ad419383fa4280d, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -15765,7 +15779,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &320611886
 RectTransform:
   m_ObjectHideFlags: 0
@@ -44518,7 +44532,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &817203123
 RectTransform:
   m_ObjectHideFlags: 0
@@ -47745,6 +47759,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   achievedColorImage: {fileID: 978686019}
   lockedColorImage: {fileID: 1984418061}
+  notAchievedNotification: clear the map with hidden to unlock!
+  hasAchievedNotification: congratulations! hidden challenge complete!
 --- !u!114 &869854435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47787,7 +47803,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 933811945}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 869854434}
+        m_TargetAssemblyTypeName: Menu.BeatmapChallengeButton, Assembly-CSharp
+        m_MethodName: Button_OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &869946788
 GameObject:
   m_ObjectHideFlags: 0
@@ -49779,8 +49807,9 @@ GameObject:
   - component: {fileID: 907007203}
   - component: {fileID: 907007202}
   - component: {fileID: 907007201}
+  - component: {fileID: 907007204}
   m_Layer: 5
-  m_Name: Buttons.Container
+  m_Name: ChallengeButtonPanel.Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49857,6 +49886,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 907007199}
   m_CullTransparentMesh: 0
+--- !u!114 &907007204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907007199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fa1379084d788e4e976aaeabdcb5799, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  standardClearButton: {fileID: 1435980029}
+  hiddenClearButton: {fileID: 869854434}
+  minesClearButton: {fileID: 1331642325}
+  fullComboButton: {fileID: 102941624}
+  maxPercentageButton: {fileID: 2001673231}
 --- !u!1 &908264396
 GameObject:
   m_ObjectHideFlags: 0
@@ -53948,7 +53994,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &978686018
 RectTransform:
   m_ObjectHideFlags: 0
@@ -60451,7 +60497,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1087851727
 Transform:
   m_ObjectHideFlags: 0
@@ -71649,6 +71695,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   achievedColorImage: {fileID: 817203124}
   lockedColorImage: {fileID: 1859229462}
+  notAchievedNotification: clear the map with mines to unlock!
+  hasAchievedNotification: congratulations! mines challenge complete!
 --- !u!114 &1331642326
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71691,7 +71739,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2022779416}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1331642325}
+        m_TargetAssemblyTypeName: Menu.BeatmapChallengeButton, Assembly-CSharp
+        m_MethodName: Button_OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1331980941
 GameObject:
   m_ObjectHideFlags: 0
@@ -82915,7 +82975,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2068914880}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1435980029}
+        m_TargetAssemblyTypeName: Menu.BeatmapChallengeButton, Assembly-CSharp
+        m_MethodName: Button_OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1435980029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82930,6 +83002,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   achievedColorImage: {fileID: 185354885}
   lockedColorImage: {fileID: 1888790530}
+  notAchievedNotification: clear the map with no mods to unlock!
+  hasAchievedNotification: congratulations! standard challenge complete!
 --- !u!1 &1436807752
 GameObject:
   m_ObjectHideFlags: 0
@@ -108476,7 +108550,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1740609747
 RectTransform:
   m_ObjectHideFlags: 0
@@ -121327,6 +121401,7 @@ MonoBehaviour:
   twoKeyDifficultyButton: {fileID: 424545472}
   fourKeyDifficultyButton: {fileID: 5797377736074967533}
   sixKeyDifficultyButton: {fileID: 699896369}
+  challengeButtonPanel: {fileID: 907007204}
   keyModeButton: {fileID: 4841147332091915694}
   songTextScroller: {fileID: 466716053}
 --- !u!1 &1966442420
@@ -123499,6 +123574,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   achievedColorImage: {fileID: 320611887}
   lockedColorImage: {fileID: 1644117290}
+  notAchievedNotification: get perfect judgement on every hitobject to unlock!
+  hasAchievedNotification: congratulations! 100% challenge complete!
 --- !u!114 &2001673232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123541,7 +123618,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1658983262}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2001673231}
+        m_TargetAssemblyTypeName: Menu.BeatmapChallengeButton, Assembly-CSharp
+        m_MethodName: Button_OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2002485994
 GameObject:
   m_ObjectHideFlags: 0

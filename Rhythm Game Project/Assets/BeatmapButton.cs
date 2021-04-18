@@ -5,6 +5,7 @@
     using UnityEngine;
     using UnityEngine.UI;
     using Enums;
+    using Audio;
 
     public sealed class BeatmapButton : MonoBehaviour
     {
@@ -147,7 +148,13 @@
         {
             beatmapOverviewManager.LoadBeatmap(buttonIndex, Difficulty.TwoKey, beatmapImage.mainTexture);
         }
-        
+
+        public void LoadBeatmapWithAudioAndImage(Difficulty _difficulty)
+        {
+            beatmapOverviewManager.LoadBeatmapWithAudioAndImage(buttonIndex, _difficulty, 
+                beatmapImage.mainTexture, UnityEngine.Random.Range(0f, 95f));
+        }
+
         public TextMeshProUGUI GetDifficultyGradeText(Difficulty _difficulty)
         {
             switch (_difficulty)
