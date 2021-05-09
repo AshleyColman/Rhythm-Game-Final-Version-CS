@@ -19,11 +19,16 @@
         [SerializeField] private TextMeshProUGUI gradeEffectText = default;
         [SerializeField] private TextMeshProUGUI accuracyText = default;
 
-        [SerializeField] private CanvasGroup flashCanvasGroup = default;
+        [SerializeField] private CanvasGroup beatFlashCanvasGroup = default;
+        [SerializeField] private CanvasGroup accuracyPanelFlashCanvasGroup = default;
+        [SerializeField] private CanvasGroup difficultyPanelFlashCanvasGroup = default;
+        [SerializeField] private CanvasGroup gradePanelFlashCanvasGroup = default;
 
         [SerializeField] private Button button = default;
 
         [SerializeField] private Difficulty difficulty = default;
+
+        private IEnumerator playButtonSelectedAnimation;
 
         private Transform gradeTextCachedTransform = default;
         private Transform gradeEffectTextCachedTransform = default;
@@ -48,6 +53,7 @@
         public void SelectButton()
         {
             button.interactable = false;
+            PlayButtonSelectedAnimation();
         }
 
         public void UnselectButton()
@@ -71,12 +77,49 @@
             gradeEffectTextCachedTransform = gradeEffectText.transform;
         }
 
+        private void PlayButtonSelectedAnimation()
+        {
+            if (playButtonSelectedAnimation != null)
+            {
+                StopCoroutine(playButtonSelectedAnimation);
+            }
+
+            playButtonSelectedAnimation = PlayButtonSelectedAnimationCoroutine();
+            StartCoroutine(playButtonSelectedAnimation);
+        }
+
+        private IEnumerator PlayButtonSelectedAnimationCoroutine()
+        {
+            accuracyPanelFlashCanvasGroup.alpha = 0f;
+            difficultyPanelFlashCanvasGroup.alpha = 0f;
+            gradePanelFlashCanvasGroup.alpha = 0f;
+            LeanTween.cancel(accuracyPanelFlashCanvasGroup.gameObject);
+            LeanTween.cancel(difficultyPanelFlashCanvasGroup.gameObject);
+            LeanTween.cancel(gradePanelFlashCanvasGroup.gameObject);
+            accuracyPanelFlashCanvasGroup.gameObject.SetActive(true);
+            difficultyPanelFlashCanvasGroup.gameObject.SetActive(true);
+            gradePanelFlashCanvasGroup.gameObject.SetActive(true);
+
+            LeanTween.alphaCanvas(accuracyPanelFlashCanvasGroup, 1f, 1f).setEasePunch();
+            LeanTween.alphaCanvas(difficultyPanelFlashCanvasGroup, 1f, 1f).setEasePunch();
+            LeanTween.alphaCanvas(gradePanelFlashCanvasGroup, 1f, 1f).setEasePunch();
+
+            yield return new WaitForSeconds(1f);
+
+            accuracyPanelFlashCanvasGroup.gameObject.SetActive(false);
+            difficultyPanelFlashCanvasGroup.gameObject.SetActive(false);
+            gradePanelFlashCanvasGroup.gameObject.SetActive(false);
+
+            yield return null;
+
+        }
+
         private void PlayFlashAnimation()
         {
-            flashCanvasGroup.alpha = 0f;
-            LeanTween.cancel(flashCanvasGroup.gameObject);
+            beatFlashCanvasGroup.alpha = 0f;
+            LeanTween.cancel(beatFlashCanvasGroup.gameObject);
 
-            LeanTween.alphaCanvas(flashCanvasGroup, 1f, 1f).setEasePunch();
+            LeanTween.alphaCanvas(beatFlashCanvasGroup, 1f, 1f).setEasePunch();
         }
 
         private void PlayGradeTextAnimation()

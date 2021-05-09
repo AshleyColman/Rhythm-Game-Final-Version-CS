@@ -24,11 +24,11 @@
         [SerializeField] private TextMeshProUGUI comboEffectText = default;
 
         private ColorCollection colorCollection;
-        private Leaderboard leaderboard;
         private GameplayAudioManager gameplayAudioManager;
         #endregion
 
         #region Properties
+        public uint HighestCombo => highestCombo;
         public TextMeshProUGUI ComboText => comboText;
         #endregion
 
@@ -54,7 +54,6 @@
         private void Awake()
         {
             colorCollection = MonoBehaviour.FindObjectOfType<ColorCollection>();
-            leaderboard = MonoBehaviour.FindObjectOfType<Leaderboard>();
             gameplayAudioManager = MonoBehaviour.FindObjectOfType<GameplayAudioManager>();
             ReferenceCachedTransforms();
         }
@@ -139,7 +138,6 @@
         {
             comboText.SetText($"{combo}x");
             comboEffectText.SetText(comboText.text);
-            leaderboard.UpdatePersonalCombo();
         }
         #endregion
     }

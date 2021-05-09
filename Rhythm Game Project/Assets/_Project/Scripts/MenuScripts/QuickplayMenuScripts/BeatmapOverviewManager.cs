@@ -30,7 +30,7 @@
 
         [SerializeField] private ChallengeButtonPanel challengeButtonPanel = default;
 
-        [SerializeField] private CustomButton keyModeButton = default;
+        [SerializeField] private KeyModeButton keyModeButton = default;
 
         [SerializeField] private HorizontalTextScroller songTextScroller;
 
@@ -53,6 +53,7 @@
         private MenuAudioManager menuAudioManager;
         private MenuTimeManager menuTimeManager;
         private BackgroundManager backgroundManager;
+        private Leaderboard leaderboard;
         #endregion
 
         #region Properties
@@ -90,7 +91,7 @@
 
         public void OnMeasure()
         {
-
+            keyModeButton.PlaySelectedBeatAnimation();
         }
 
         // Loads beatmap without an image texture.
@@ -127,15 +128,16 @@
                 creatorText.SetText($"created by {fileManager.Beatmap.CreatorName}");
                 keyModeButton.SetText($"{fileManager.Beatmap.TotalKeys}k");
 
+                keyModeButton.PlayButtonSelectedAnimation();
+
                 PlayDifficultyStatisticsAnimation();
 
                 UnselectCurrentDifficultyButton();
                 SelectBeatmapDifficulty();
 
                 challengeButtonPanel.SetButtonVisuals();
-                // Load Leaderboard. 
-                // Update visuals.
 
+                leaderboard.RequestNewLeaderboard();
 
                 songTextScroller.Scroll();
             }
@@ -238,6 +240,7 @@
             menuAudioManager = FindObjectOfType<MenuAudioManager>();
             menuTimeManager = FindObjectOfType<MenuTimeManager>();
             backgroundManager = FindObjectOfType<BackgroundManager>();
+            leaderboard = FindObjectOfType<Leaderboard>();
         }
 
         private void SetSelectedButtonIndex(int _index)

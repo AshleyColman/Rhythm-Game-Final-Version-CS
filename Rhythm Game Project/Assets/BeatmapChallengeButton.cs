@@ -3,6 +3,7 @@
     using UnityEngine;
     using UnityEngine.UI;
     using Enums;
+    using System.Collections;
 
     public sealed class BeatmapChallengeButton : MonoBehaviour
     {
@@ -10,8 +11,12 @@
         [SerializeField] private Image achievedColorImage = default;
         [SerializeField] private Image lockedColorImage = default;
 
+        [SerializeField] private CanvasGroup flashCanvasGroup = default;
+
         [SerializeField] private string notAchievedNotification = default;
         [SerializeField] private string hasAchievedNotification = default;
+
+        private IEnumerator playFlashCanvasGroupAnimation;
 
         private Color32 achievedNotificationColor;
 
@@ -55,6 +60,18 @@
             }
         }
 
+        public void PlayFlashCanvasGroupAnimation()
+        {
+            if (playFlashCanvasGroupAnimation != null)
+            {
+                StopCoroutine(playFlashCanvasGroupAnimation);
+            }
+
+            playFlashCanvasGroupAnimation = PlayFlashCanvasGroupAnimationCoroutine();
+            StartCoroutine(playFlashCanvasGroupAnimation);
+        }
+
+
         public void Button_OnClick()
         {
             if (hasAchieved == true)
@@ -81,7 +98,21 @@
             achievedNotificationColor = new Color(achievedColorImage.color.r, achievedColorImage.color.g,
                 achievedColorImage.color.b, 0.8f);
         }
+
+        private IEnumerator PlayFlashCanvasGroupAnimationCoroutine()
+        {
+            flashCanvasGroup.alpha = 0f;
+            LeanTween.cancel(flashCanvasGroup.gameObject);
+            flashCanvasGroup.gameObject.SetActive(true);
+
+            LeanTween.alphaCanvas(flashCanvasGroup, 1f, 1f).setEasePunch();
+
+            yield return new WaitForSeconds(1f);
+
+            flashCanvasGroup.gameObject.SetActive(false);
+
+            yield return null;
+        }
         #endregion
     }
-
 }

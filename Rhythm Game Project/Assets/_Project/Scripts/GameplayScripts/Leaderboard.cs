@@ -9,7 +9,7 @@
     public sealed class Leaderboard : MonoBehaviour
     {
         #region Private Fields
-        private byte buttonArraySize = 10;
+        private byte buttonArraySize = 13;
 
         [SerializeField] ScrollRect leaderboardScrollRect = default;
 
@@ -48,11 +48,6 @@
             CheckPersonalPosition();
         }
 
-        public void UpdatePersonalCombo()
-        {
-            personalButton.SetCombo(comboManager.ComboText);
-        }
-
         public void UpdatePersonalGrade()
         {
             personalButton.SetGrade(gradeSlider.GradeText);
@@ -72,7 +67,8 @@
         {
             DeactivateLeaderboard();
             InstantiateButtons();
-            SetButtonProperties();
+            SetupComputerGradeButtonProperties();
+            //SetButtonProperties();
             SetPersonalButtonProperties();
             ActivateLeaderboard();
             yield return new WaitForEndOfFrame();
@@ -103,25 +99,41 @@
 
         private void SetButtonProperties()
         {
+
+        }
+
+        private void SetupComputerGradeButtonProperties()
+        {
+            Grade[] gradeArr = new Grade[] { Grade.S_PLUS, Grade.S, Grade.A_PLUS, Grade.A, Grade.B_PLUS, Grade.B,
+                Grade.C_PLUS, Grade.C, Grade.D_PLUS, Grade.D, Grade.E_PLUS, Grade.E, Grade.F_PLUS, Grade.F };
+
+            byte[] gradeRequirementArr = new byte[] { GradeData.GradeRequiredSPlus, GradeData.GradeRequiredS,
+            GradeData.GradeRequiredAPlus, GradeData.GradeRequiredA, GradeData.GradeRequiredBPlus, GradeData.GradeRequiredB,
+            GradeData.GradeRequiredCPlus, GradeData.GradeRequiredC, GradeData.GradeRequiredDPlus, GradeData.GradeRequiredD,
+            GradeData.GradeRequiredEPlus, GradeData.GradeRequiredE, GradeData.GradeRequiredFPlus, GradeData.GradeRequiredF};
+
             for (byte i = 0; i < buttonArray.Length; i++)
             {
                 byte index = (byte)(i + 1);
                 buttonArray[i].SetPosition(index);
-                buttonArray[i].SetName("name" + index);
-                buttonArray[i].SetScore(scoreManager.MaxBaseScorePossible / index);
-                buttonArray[i].SetCombo("?");
+                buttonArray[i].SetName($"CPU {index}");
 
+                if (i <= gradeArr.Length)
+                {
+                    // CPU score is based on the max base score possible, by the percentage given, multiplied by the highest base multiplier x5.
+                    double percentageScore = ((scoreManager.MaxBaseScorePossible / 100) * gradeRequirementArr[i]) * 5;
+                    buttonArray[i].SetScore((uint)percentageScore);
 
-                float accuracy = ((float)buttonArray[i].Score / (float)scoreManager.MaxBaseScorePossible) * 100;
-                Grade grade = GradeData.GetCurrentGrade(accuracy);
-                buttonArray[i].SetGrade(gradeData.GetCurrentGradeColor(grade), GradeData.GetCurrentGradeString(grade));
+                    buttonArray[i].SetGrade(gradeData.GetCurrentGradeGradient(gradeArr[i]),
+                        GradeData.GetCurrentGradeString(gradeArr[i]));
+                }
             }
         }
 
         private void SetPersonalButtonProperties()
         {
             personalButton.transform.SetAsLastSibling();
-            personalButton.SetPosition((byte)(buttonArray.Length + 1));
+            personalButton.SetPosition((byte)(buttonArray.Length + 1), "you");
             personalButton.SetScore(0);
         }
 
@@ -140,7 +152,7 @@
                     byte tempPosition = buttonArray[nextPosition].Position;
                     buttonArray[nextPosition].SetPosition(personalButton.Position);
                     buttonArray[nextPosition].Deactivate();
-                    personalButton.SetPosition(tempPosition);
+                    personalButton.SetPositionValueOnly(tempPosition);
                 }
             }
         }

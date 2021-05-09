@@ -23,16 +23,20 @@
         [SerializeField] private Transform multiplierTextCachedTransform = default;
         [SerializeField] private Transform multiplierEffectTextCachedTransform = default;
 
+        [SerializeField] private TMP_ColorGradient multiplierGradientX1 = default;
+        [SerializeField] private TMP_ColorGradient multiplierGradientX2 = default;
+        [SerializeField] private TMP_ColorGradient multiplierGradientX3 = default;
+        [SerializeField] private TMP_ColorGradient multiplierGradientX4 = default;
+
         private byte multiplier = 1;
         private byte highestMultiplier = 0;
 
         private IEnumerator playDeactivateTweenCoroutine;
-
-        private ColorCollection colorCollection;
         #endregion
 
         #region Properties
         public byte Multiplier => multiplier;
+        public TMP_ColorGradient MultiplierTextColorGradient => multiplierText.colorGradientPreset;
         #endregion
 
         #region Public Methods
@@ -48,10 +52,12 @@
 
         public void ActivateFeverMultiplier()
         {
+            DoubleMultiplier();
             multiplierText.SetText($"x{multiplier}");
             multiplierEffectText.SetText(multiplier.ToString());
-            SetMultiplierColor();
+            SetMultiplierTextColorGradient();
             PlayActivatedTween();
+            multiplierContainer.gameObject.SetActive(true);
             CheckIfHighest();
         }
 
@@ -63,11 +69,6 @@
         #endregion
 
         #region Private Methods
-        private void Awake()
-        {
-            colorCollection = FindObjectOfType<ColorCollection>();
-        }
-
         private void CheckIfHighest()
         {
             if (multiplier > highestMultiplier)
@@ -80,7 +81,6 @@
         {
             LeanTween.cancel(multiplierText.gameObject);
             LeanTween.cancel(multiplierEffectText.gameObject);
-            multiplierContainer.gameObject.SetActive(true);
             multiplierTextCachedTransform.localScale = Vector3.one;
             multiplierEffectTextCachedTransform.localScale = Vector3.one;
 
@@ -99,26 +99,33 @@
             StartCoroutine(playDeactivateTweenCoroutine);
         }
 
-        private void SetMultiplierColor()
+        private void SetMultiplierTextColorGradient()
         {
             switch(multiplier)
             {
-                case 1:
-                    multiplierText.color = colorCollection.YellowColor;
-                    break;
-                case 2:
-                    multiplierText.color = colorCollection.DarkBlueColor;
-                    break;
-                case 3:
-                    multiplierText.color = colorCollection.OrangeColor;
-                    break;
                 case 4:
-                    multiplierText.color = colorCollection.PurpleColor;
+                    multiplierText.colorGradientPreset = multiplierGradientX1;
+                    break;
+                case 6:
+                    multiplierText.colorGradientPreset = multiplierGradientX2;
+                    break;
+                case 8:
+                    multiplierText.colorGradientPreset = multiplierGradientX3;
+                    break;
+                case 10:
+                    multiplierText.colorGradientPreset = multiplierGradientX4;
                     break;
                 default:
-                    multiplierText.color = colorCollection.WhiteColor;
+                    multiplierText.colorGradientPreset = multiplierGradientX1;
                     break;
             }
+
+            multiplierEffectText.colorGradientPreset = multiplierText.colorGradientPreset;
+        }
+
+        private void DoubleMultiplier()
+        {
+            multiplier = (byte)(multiplier * 2);
         }
 
         private IEnumerator PlayDeactivateTweenCoroutine()

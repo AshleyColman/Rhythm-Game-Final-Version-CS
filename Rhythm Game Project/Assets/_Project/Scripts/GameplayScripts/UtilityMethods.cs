@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 public static class UtilityMethods
 {
@@ -39,6 +40,30 @@ public static class UtilityMethods
                 break;
         }
         return _stringBuilder;
+    }
+
+    // Return string of days, hours or minutes from the time passed and the current time
+    public static string GetTimeSinceDateInput(string _dateInput)
+    {
+        DateTime parsedDate = DateTime.Parse(_dateInput);
+        TimeSpan span = (DateTime.Now - parsedDate);
+        string time = "";
+
+        if (span.Days < 1)
+        {
+            time = ($"{span.Hours} hours {span.Minutes} minutes ago");
+
+            if (span.Hours < 1)
+            {
+                time = ($"{span.Minutes} minutes ago");
+            }
+        }
+        else
+        {
+            time = ($"{span.Days} days ago");
+        }
+
+        return time;
     }
 
     public static string AddZerosToScoreString(string _string)

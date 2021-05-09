@@ -19,7 +19,7 @@
         private float totalAccuracy = 0;
         private float accuracyLerpTimer = 0f;
 
-        private Grade currentGrade = Grade.X;
+        private Grade currentGrade = Grade.F;
 
         private StringBuilder accuracyTextStringBuilder = new StringBuilder();
 
@@ -35,15 +35,14 @@
         #region Properties
         public float CurrentAccuracy => currentAccuracy;
         public Grade CurrentGrade => currentGrade;
+        public TextMeshProUGUI AccuracyText => accuracyText;
         #endregion
 
         #region Public Methods
         public void UpdateAccuracy()
         {
-            totalAccuracy = ((float)scoreManager.CurrentBaseScore / (float)scoreManager.MaxBaseScorePossible) * 100;
+            totalAccuracy = ((float)scoreManager.TotalBaseScore / (float)scoreManager.MaxBaseScorePossible) * 100;
             ResetAccuracyLerpTimer();
-            CheckIfNewGradeAchieved();
-            gradeSlider.CalculateValueForCurrentGrade();
         }
         #endregion
 
@@ -66,7 +65,6 @@
         private void CheckIfNewGradeAchieved()
         {
             Grade resultGrade = GradeData.GetCurrentGrade(currentAccuracy);
-
             if (currentGrade != resultGrade)
             {
                 currentGrade = resultGrade;
@@ -94,11 +92,13 @@
         {
             while (gameManager.GameplayStarted == true)
             {
-                if (currentAccuracy != totalAccuracy)
+                if (currentAccuracy < totalAccuracy)
                 {
                     accuracyLerpTimer += Time.deltaTime / accuracyLerpDuration;
                     currentAccuracy = Mathf.Lerp(currentAccuracy, totalAccuracy, accuracyLerpTimer);
                     UpdateAccuracyText();
+                    CheckIfNewGradeAchieved();
+                    gradeSlider.CalculateValueForCurrentGrade();
                 }
                 yield return null;
             }

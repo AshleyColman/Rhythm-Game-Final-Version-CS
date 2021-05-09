@@ -53,7 +53,7 @@
             yield return waitForSeconds;
             countDownText.SetText("1");
             yield return waitForSeconds;
-            countDownText.SetText("LETS PLAY");
+            countDownText.SetText("go");
             yield return waitForSeconds;
             countDownText.gameObject.SetActive(false);
 

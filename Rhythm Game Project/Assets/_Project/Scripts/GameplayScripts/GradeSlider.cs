@@ -5,9 +5,15 @@
     using TMPro;
     using Gameplay;
     using Enums;
+    using VisualEffects;
 
     public sealed class GradeSlider : MonoBehaviour
     {
+        #region Constants
+        private readonly Vector3 scaleTo = new Vector3(1.25f, 1.25f, 1f);
+        private readonly Vector3 effectScaleTo = new Vector3(1.75f, 1.75f, 1f);
+        #endregion
+
         #region Private Fields
         [SerializeField] private Slider gradeSlider = default;
 
@@ -17,6 +23,9 @@
 
         [SerializeField] private TextMeshProUGUI gradeText = default;
         [SerializeField] private TextMeshProUGUI gradeEffectText = default;
+
+        private Transform gradeTextTransform;
+        private Transform gradeEffectTextTransform;
 
         private AccuracyManager accuracyManager;
         private GradeData gradeData;
@@ -156,23 +165,43 @@
             gradeEffectText.SetText(gradeText.text);
             gradeEffectText.colorGradientPreset = gradeText.colorGradientPreset;
             leaderboard.UpdatePersonalGrade();
+            PlayFullFlashFillTween();
         }
         #endregion
 
         #region Private Methods
         private void Awake()
         {
-            accuracyManager = MonoBehaviour.FindObjectOfType<AccuracyManager>();
-            gradeData = MonoBehaviour.FindObjectOfType<GradeData>();
-            leaderboard = MonoBehaviour.FindObjectOfType<Leaderboard>();
+            accuracyManager = FindObjectOfType<AccuracyManager>();
+            gradeData = FindObjectOfType<GradeData>();
+            leaderboard = FindObjectOfType<Leaderboard>();
+
+            ReferenceTransforms();
+        }
+
+        private void ReferenceTransforms()
+        {
+            gradeTextTransform = gradeText.transform;
+            gradeEffectTextTransform = gradeEffectText.transform;
         }
 
         private void PlayGradeEffectTextTween()
         {
+            LeanTween.cancel(gradeText.gameObject);
             LeanTween.cancel(gradeEffectText.gameObject);
-            gradeEffectText.transform.localScale = Vector3.one;
-            //LeanTween.alphaCanvas(canvasGroup, 0f, 0.25f).setEaseOutExpo();
-            LeanTween.scale(gradeEffectText.gameObject, new Vector3(1.5f, 1.5f, 1f), 1f).setEasePunch();
+
+            gradeTextTransform.localScale = Vector3.one;
+            gradeEffectTextTransform.localScale = Vector3.one;
+
+            LeanTween.scale(gradeText.gameObject, scaleTo, 1f).setEasePunch();
+            LeanTween.scale(gradeEffectText.gameObject, effectScaleTo, 1f).setEasePunch();
+        }
+
+        private void PlayFullFlashFillTween()
+        {
+            LeanTween.cancel(flashImageCanvasGroup.gameObject);
+            flashImageCanvasGroup.alpha = 0f;
+            LeanTween.alphaCanvas(flashImageCanvasGroup, 1f, 0.25f).setLoopPingPong(1);
         }
         #endregion
     }

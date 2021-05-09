@@ -78,7 +78,7 @@
             beatmap.TotalKeys = 2;
             beatmap.SongLength = "2 minutes 30 seconds";
             beatmap.CreatedDate = DateTime.Now;
-            beatmap.DatabaseTable = "testTable";
+            beatmap.DatabaseTable = "testtable";
             beatmap.HasTypeArray = new bool[1];
             beatmap.HasTypeArray[0] = true;
 

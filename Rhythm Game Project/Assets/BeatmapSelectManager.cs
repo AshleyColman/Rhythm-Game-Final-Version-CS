@@ -14,6 +14,8 @@
     using Audio;
     using Background;
     using SceneLoading;
+    using Profile;
+    using ImageLoad;
 
     public sealed class BeatmapSelectManager : MonoBehaviour, IMenu
     {
@@ -230,11 +232,8 @@
 
         private void LoadNewBeatmapButtonImage(int _index)
         {
-            // Set delegate to allow images to be updated inside this script.
-            imageLoader.updatedImageIncrementerDelegate = IncrementTotalImagesLoaded;
-
-            // Load image.
-            imageLoader.LoadCompressedImageFile(GetBeatmapImagePath(_index), beatmapButtonList[_index].BeatmapImage);
+            imageLoader.LoadCompressedImageFile(GetBeatmapImagePath(_index), beatmapButtonList[_index].BeatmapImage, 
+                IncrementTotalImagesLoaded);
         }
 
         private string GetBeatmapImagePath(int _index)
@@ -285,7 +284,7 @@
             TMP_ColorGradient gradeColor = gradeData.GetCurrentGradeGradient(fileManager.Beatmap.PlayerDifficultyGrade);
 
             // Check if the player name saved on the beatmap matches the current signed in user to confirm grade achieved.
-            if (Player.Username == fileManager.Beatmap.PlayerDifficultyGradeUsername)
+            if (ProfileManager.Username == fileManager.Beatmap.PlayerDifficultyGradeUsername)
             {
                 beatmapButtonList[_index].SetDifficultyGradeTrue(_difficulty, fileManager.Beatmap.PlayerDifficultyGrade,
                     fileManager.Beatmap.DifficultyAccuracy, gradeColor);

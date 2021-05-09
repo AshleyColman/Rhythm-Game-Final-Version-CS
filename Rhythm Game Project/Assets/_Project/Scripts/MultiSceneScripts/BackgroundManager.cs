@@ -3,8 +3,8 @@
     using System.Collections;
     using UnityEngine;
     using UnityEngine.UI;
-    using Menu;
     using Loading;
+    using ImageLoad;
 
     public sealed class BackgroundManager : MonoBehaviour
     {

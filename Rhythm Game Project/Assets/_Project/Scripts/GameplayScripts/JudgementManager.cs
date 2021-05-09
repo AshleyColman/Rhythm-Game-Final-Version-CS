@@ -11,6 +11,13 @@
         private uint miss = 0;
         #endregion
 
+        #region Properties
+        public uint Perfect => perfect;
+        public uint Great => great;
+        public uint Okay => okay;
+        public uint Miss => miss;
+        #endregion
+
         #region Public Methods
         public void IncreaseOkayCount()
         {

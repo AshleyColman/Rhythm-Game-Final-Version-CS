@@ -7,6 +7,24 @@
     public sealed class GradeData : MonoBehaviour
     {
         #region Constants
+        [SerializeField] private TextMeshProUGUI presetGradeText = default;
+
+        [SerializeField] private TMP_ColorGradient gradientS = default;
+        [SerializeField] private TMP_ColorGradient gradientA = default;
+        [SerializeField] private TMP_ColorGradient gradientB = default;
+        [SerializeField] private TMP_ColorGradient gradientC = default;
+        [SerializeField] private TMP_ColorGradient gradientD = default;
+        [SerializeField] private TMP_ColorGradient gradientE = default;
+        [SerializeField] private TMP_ColorGradient gradientF = default;
+
+        [SerializeField] private Color32 colorS = default;
+        [SerializeField] private Color32 colorA = default;
+        [SerializeField] private Color32 colorB = default;
+        [SerializeField] private Color32 colorC = default;
+        [SerializeField] private Color32 colorD = default;
+        [SerializeField] private Color32 colorE = default;
+        [SerializeField] private Color32 colorF = default;
+
         public const string GradeStringSPlus = "S+";
         public const string GradeStringS = "S";
         public const string GradeStringAPlus = "A+";
@@ -36,22 +54,6 @@
         public const byte GradeRequiredE = 45;
         public const byte GradeRequiredFPlus = 40;
         public const byte GradeRequiredF = 0;
-
-        [SerializeField] private TMP_ColorGradient gradientS = default;
-        [SerializeField] private TMP_ColorGradient gradientA = default;
-        [SerializeField] private TMP_ColorGradient gradientB = default;
-        [SerializeField] private TMP_ColorGradient gradientC = default;
-        [SerializeField] private TMP_ColorGradient gradientD = default;
-        [SerializeField] private TMP_ColorGradient gradientE = default;
-        [SerializeField] private TMP_ColorGradient gradientF = default;
-
-        [SerializeField] private Color32 colorS = default;
-        [SerializeField] private Color32 colorA = default;
-        [SerializeField] private Color32 colorB = default;
-        [SerializeField] private Color32 colorC = default;
-        [SerializeField] private Color32 colorD = default;
-        [SerializeField] private Color32 colorE = default;
-        [SerializeField] private Color32 colorF = default;
         #endregion
 
         #region Public Methods
@@ -254,6 +256,14 @@
                 default:
                     return gradientF;
             }
+        }
+
+        public TextMeshProUGUI GetGradeText(float _accuracy)
+        {
+            Grade grade = GetCurrentGrade(_accuracy);
+            presetGradeText.SetText(GetCurrentGradeString(grade));
+            presetGradeText.colorGradientPreset = GetCurrentGradeGradient(grade);
+            return presetGradeText;
         }
         #endregion
     }

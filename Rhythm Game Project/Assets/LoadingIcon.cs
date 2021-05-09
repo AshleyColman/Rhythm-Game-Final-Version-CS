@@ -23,11 +23,14 @@
         #region Public Methods
         public void DisplayLoadingIcon()
         {
-            loadingIcon.gameObject.SetActive(true);
             loadingIconCachedTransform.localRotation = Quaternion.identity;
+            loadingIconCachedTransform.localScale = Vector3.zero;
             canvasGroup.alpha = 0f;
             LeanTween.cancel(loadingIcon);
-            LeanTween.alphaCanvas(canvasGroup, 1f, 0.1f);
+
+            loadingIcon.gameObject.SetActive(true);
+            LeanTween.alphaCanvas(canvasGroup, 1f, 0.25f).setEaseOutExpo();
+            LeanTween.scale(loadingIcon, Vector3.one, 0.25f).setEaseOutExpo();
         }
 
         public void HideLoadingIcon()
@@ -51,8 +54,9 @@
         private IEnumerator HideLoadingIconCoroutine()
         {
             LeanTween.cancel(loadingIcon);
-            LeanTween.alphaCanvas(canvasGroup, 0f, 0.1f);
-            yield return new WaitForSeconds(0.1f);
+            LeanTween.alphaCanvas(canvasGroup, 0f, 0.25f).setEaseOutExpo();
+            LeanTween.scale(loadingIcon, Vector3.zero, 0.25f).setEaseOutExpo();
+            yield return new WaitForSeconds(0.25f);
             loadingIcon.gameObject.SetActive(false);
             yield return null;
         }

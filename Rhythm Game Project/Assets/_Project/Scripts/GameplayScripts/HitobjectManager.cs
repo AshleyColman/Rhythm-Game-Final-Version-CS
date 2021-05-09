@@ -17,14 +17,14 @@
         private double greatEarlyStartTime = 0;
         private double okayEarlyStartTime = 0;
 
-        private ushort currentHittableObjectIndex = 0;
+        [SerializeField] private ushort currentHittableObjectIndex = 0;
 
         private KeyCode hitKeyCode;
         private KeyCode[] missKeyCodeArray;
 
         private IEnumerator trackHitobjects;
 
-        private Hitobject currentHittableObject;
+        [SerializeField] private Hitobject currentHittableObject;
 
         private GameplayTimeManager gameplayTimeManager;
         private HitobjectSpawnManager hitobjectSpawnManager;
@@ -85,7 +85,12 @@
 
         public void TrackHitobjects()
         {
-            StopCoroutine(trackHitobjects);
+            if (trackHitobjects != null)
+            {
+                StopCoroutine(trackHitobjects);
+            }
+
+            trackHitobjects = TrackHitobjectsCoroutine();
             StartCoroutine(trackHitobjects);
         }
 
@@ -104,21 +109,20 @@
         #region Private Methods
         private void Awake()
         {
-            gameplayTimeManager = MonoBehaviour.FindObjectOfType<GameplayTimeManager>();
-            playerSettings = MonoBehaviour.FindObjectOfType<PlayerSettings>();
-            gameManager = MonoBehaviour.FindObjectOfType<GameManager>();
-            hitobjectSpawnManager = MonoBehaviour.FindObjectOfType<HitobjectSpawnManager>();
-            gameplayAudioManager = MonoBehaviour.FindObjectOfType<GameplayAudioManager>();
-            colorCollection = MonoBehaviour.FindObjectOfType<ColorCollection>();
-            hitobjectFollower = MonoBehaviour.FindObjectOfType<HitobjectFollower>();
-            healthManager = MonoBehaviour.FindObjectOfType<HealthManager>();
-            comboManager = MonoBehaviour.FindObjectOfType<ComboManager>();
-            accuracyManager = MonoBehaviour.FindObjectOfType<AccuracyManager>();
-            judgementManager = MonoBehaviour.FindObjectOfType<JudgementManager>();
-            scoreManager = MonoBehaviour.FindObjectOfType<ScoreManager>();
-            feverManager = MonoBehaviour.FindObjectOfType<FeverManager>();
-            gameplayInputManager = MonoBehaviour.FindObjectOfType<GameplayInputManager>();
-            trackHitobjects = TrackHitobjectsCoroutine();
+            gameplayTimeManager = FindObjectOfType<GameplayTimeManager>();
+            playerSettings = FindObjectOfType<PlayerSettings>();
+            gameManager = FindObjectOfType<GameManager>();
+            hitobjectSpawnManager = FindObjectOfType<HitobjectSpawnManager>();
+            gameplayAudioManager = FindObjectOfType<GameplayAudioManager>();
+            colorCollection = FindObjectOfType<ColorCollection>();
+            hitobjectFollower = FindObjectOfType<HitobjectFollower>();
+            healthManager = FindObjectOfType<HealthManager>();
+            comboManager = FindObjectOfType<ComboManager>();
+            accuracyManager = FindObjectOfType<AccuracyManager>();
+            judgementManager = FindObjectOfType<JudgementManager>();
+            scoreManager = FindObjectOfType<ScoreManager>();
+            feverManager = FindObjectOfType<FeverManager>();
+            gameplayInputManager = FindObjectOfType<GameplayInputManager>();
         }
 
         private IEnumerator TrackHitobjectsCoroutine()
@@ -179,7 +183,7 @@
 
         private void UpdateInputKeys()
         {
-            switch (hitobjectSpawnManager.GetCurrentHitobjectType())
+            switch (hitobjectSpawnManager.GetCurrentHitobjectType(currentHittableObjectIndex))
             {
                 case (byte)HitobjectType.Hitobject0:
                     hitKeyCode = Hitobject0.HitKeyCode;
@@ -191,10 +195,10 @@
         private void HasHit()
         {
             comboManager.IncreaseCombo();
-            accuracyManager.UpdateAccuracy();
             gameplayAudioManager.PlayHitSound();
             feverManager.IncrementFeverSlider();
             CheckJudgements();
+            accuracyManager.UpdateAccuracy();
             currentHittableObject.PlayHitTween();
             SetCurrentHittableObjectToNull();
             IncrementCurrentHittableObjectIndex();

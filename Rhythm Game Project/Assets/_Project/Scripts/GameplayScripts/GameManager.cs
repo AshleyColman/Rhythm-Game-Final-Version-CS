@@ -18,6 +18,7 @@
         private ScoreManager scoreManager;
         private Leaderboard leaderboard;
         private AccuracyManager accuracyManager;
+        private SongSlider songSlider;
         #endregion
 
         #region Properties
@@ -35,6 +36,7 @@
         public void StartGameplay()
         {
             gameplayStarted = true;
+            songSlider.UpdateSongSliderProgress();
             gameplayTimeManager.StartTimer();
             hitobjectSpawnManager.TrackHitobjects();
             scoreManager.TrackIncreasingScore();
@@ -45,15 +47,16 @@
         #region Private Methods
         private void Awake()
         {
-            gameplayAudioManager = MonoBehaviour.FindObjectOfType<GameplayAudioManager>();
-            gameplayTimeManager = MonoBehaviour.FindObjectOfType<GameplayTimeManager>();
-            hitobjectSpawnManager = MonoBehaviour.FindObjectOfType<HitobjectSpawnManager>();
-            hitobjectManager = MonoBehaviour.FindObjectOfType<HitobjectManager>();
-            countdown = MonoBehaviour.FindObjectOfType<Countdown>();
-            healthManager = MonoBehaviour.FindObjectOfType<HealthManager>();
-            scoreManager = MonoBehaviour.FindObjectOfType<ScoreManager>();
-            leaderboard = MonoBehaviour.FindObjectOfType<Leaderboard>();
-            accuracyManager = MonoBehaviour.FindObjectOfType<AccuracyManager>();
+            gameplayAudioManager = FindObjectOfType<GameplayAudioManager>();
+            gameplayTimeManager = FindObjectOfType<GameplayTimeManager>();
+            hitobjectSpawnManager = FindObjectOfType<HitobjectSpawnManager>();
+            hitobjectManager = FindObjectOfType<HitobjectManager>();
+            countdown = FindObjectOfType<Countdown>();
+            healthManager = FindObjectOfType<HealthManager>();
+            scoreManager = FindObjectOfType<ScoreManager>();
+            leaderboard = FindObjectOfType<Leaderboard>();
+            accuracyManager = FindObjectOfType<AccuracyManager>();
+            songSlider = FindObjectOfType<SongSlider>();
         }
 
         private void Start()

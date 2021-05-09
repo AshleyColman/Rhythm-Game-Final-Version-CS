@@ -40,6 +40,8 @@
                 {
                     _beatmapChallengeButton.SetAchieved();
                 }
+
+                _beatmapChallengeButton.PlayFlashCanvasGroupAnimation();
             }
             else
             {

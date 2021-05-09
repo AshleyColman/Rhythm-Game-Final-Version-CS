@@ -16,7 +16,6 @@
         [SerializeField] private TextMeshProUGUI positionText = default;
         [SerializeField] private TextMeshProUGUI scoreText = default;
         [SerializeField] private TextMeshProUGUI nameText = default;
-        [SerializeField] private TextMeshProUGUI comboText = default;
         [SerializeField] private TextMeshProUGUI gradeText = default;
         #endregion
 
@@ -29,7 +28,18 @@
         public void SetPosition(byte _position)
         {
             position = _position;
-            positionText.SetText(_position.ToString());
+            positionText.SetText($"{_position}#");
+        }
+
+        public void SetPositionValueOnly(byte _position)
+        {
+            position = _position;
+        }
+
+        public void SetPosition(byte _bytePosition, string _stringPosition)
+        {
+            position = _bytePosition;
+            positionText.SetText(_stringPosition);
         }
 
         public void SetScore(uint _score)
@@ -43,25 +53,15 @@
             scoreText.SetText(_text.text);
         }
 
-        public void SetCombo(string _text)
+        public void SetGrade(TMP_ColorGradient _color, string _text)
         {
-            comboText.SetText(_text);
-        }
-
-        public void SetCombo(TextMeshProUGUI _text)
-        {
-            comboText.SetText(_text.text);
-        }
-
-        public void SetGrade(Color32 _color, string _text)
-        {
-            gradeText.color = _color;
+            gradeText.colorGradientPreset = _color;
             gradeText.SetText(_text);
         }
 
         public void SetGrade(TextMeshProUGUI _text)
         {
-            gradeText.color = _text.color;
+            gradeText.colorGradientPreset = _text.colorGradientPreset;
             gradeText.SetText(_text.text);
         }
 

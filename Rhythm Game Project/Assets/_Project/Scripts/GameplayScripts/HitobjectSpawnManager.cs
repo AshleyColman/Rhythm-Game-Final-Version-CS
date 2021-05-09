@@ -211,18 +211,23 @@ namespace Gameplay
 
         public void TrackHitobjects()
         {
-            StopCoroutine(trackHitobjects);
+            if (trackHitobjects != null)
+            {
+                StopCoroutine(trackHitobjects);
+            }
+
+            trackHitobjects = TrackHitobjectsCoroutine();
             StartCoroutine(trackHitobjects);
         }
 
-        public byte GetCurrentHitobjectType()
+        public byte GetCurrentHitobjectType(int _hitobjectIndex)
         {
-            return typeArray[hitobjectIndex];
+            return typeArray[_hitobjectIndex];
         }
 
         public void CheckIfAllPlayed()
         {
-            if (hitobjectManager.CurrentHittableObjectIndex >= (totalHitobjects - 1))
+            if (hitobjectManager.CurrentHittableObjectIndex >= totalHitobjects)
             {
                 allObjectsPlayed = true;
             }
@@ -237,7 +242,6 @@ namespace Gameplay
             gameplayTimeManager = MonoBehaviour.FindObjectOfType<GameplayTimeManager>();
             playerSettings = MonoBehaviour.FindObjectOfType<PlayerSettings>();
             colorCollection = MonoBehaviour.FindObjectOfType<ColorCollection>();
-            trackHitobjects = TrackHitobjectsCoroutine();
         }
 
         private IEnumerator TrackHitobjectsCoroutine()

@@ -9,6 +9,7 @@
     {
         #region Constants
         private const float scoreLerpDuration = 0.25f;
+        private readonly Vector3 effectScaleTo = new Vector3(1.25f, 1.25f, 1f);
         #endregion
 
         #region Private Fields
@@ -24,6 +25,8 @@
 
         [SerializeField] private TextMeshProUGUI scoreText = default;
 
+        private Transform scoreEffectTextTransform;
+
         private Leaderboard leaderboard;
         private GameManager gameManager;
         private ScoreEffect scoreEffect;
@@ -31,8 +34,10 @@
         #endregion
 
         #region Properties
+        public uint TotalScore => totalScore;
         public uint CurrentScore => currentScore;
         public uint CurrentBaseScore => currentBaseScore;
+        public uint TotalBaseScore => totalBaseScore;
         public uint MaxBaseScorePossible => maxBaseScorePossible;
         public TextMeshProUGUI ScoreText => scoreText;
         #endregion
@@ -61,10 +66,10 @@
         #region Private Methods
         private void Awake()
         {
-            leaderboard = MonoBehaviour.FindObjectOfType<Leaderboard>();
-            gameManager = MonoBehaviour.FindObjectOfType<GameManager>();
-            scoreEffect = MonoBehaviour.FindObjectOfType<ScoreEffect>();
-            multiplierManager = MonoBehaviour.FindObjectOfType<MultiplierManager>();
+            leaderboard = FindObjectOfType<Leaderboard>();
+            gameManager = FindObjectOfType<GameManager>();
+            scoreEffect = FindObjectOfType<ScoreEffect>();
+            multiplierManager = FindObjectOfType<MultiplierManager>();
         }
 
         private void ResetScoreLerpTimer()

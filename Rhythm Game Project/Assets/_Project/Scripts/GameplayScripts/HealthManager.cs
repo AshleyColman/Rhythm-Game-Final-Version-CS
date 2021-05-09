@@ -10,7 +10,7 @@ namespace Gameplay
     public sealed class HealthManager : MonoBehaviour
     {
         #region Constants
-        private const byte DrainRate = 15;
+        private const byte DrainRate = 5;
         private const byte GrowRate = 35;
         #endregion
 
@@ -20,10 +20,6 @@ namespace Gameplay
         [SerializeField] private Gradient gradient = default;
 
         [SerializeField] private Image healthSliderColorImage = default;
-
-        [SerializeField] private TextMeshProUGUI healthText = default;
-
-        private StringBuilder healthTextStringBuilder = new StringBuilder();
 
         private bool hasFailed = false;
 
@@ -67,7 +63,6 @@ namespace Gameplay
                 healthSlider.value = Mathf.MoveTowards(healthSlider.value, healthSlider.minValue, Time.deltaTime * DrainRate);
                 CheckIfFailed();
                 UpdateHealthSliderColor();
-                UpdateHealthText();
                 yield return null;
             }
             yield return null;
@@ -80,7 +75,6 @@ namespace Gameplay
                 healthSlider.value = Mathf.MoveTowards(healthSlider.value, healthSlider.maxValue, Time.deltaTime * GrowRate);
                 CheckIfFailed();
                 UpdateHealthSliderColor();
-                UpdateHealthText();
                 yield return null;
             }
 
@@ -116,14 +110,5 @@ namespace Gameplay
         {
             healthSliderColorImage.color = gradient.Evaluate(healthSlider.normalizedValue);
         }
-
-        private void UpdateHealthText()
-        {
-            healthTextStringBuilder.Append(healthSlider.value.ToString("F0"));
-            healthTextStringBuilder.Append("%");
-            healthText.SetText(healthTextStringBuilder.ToString());
-            healthTextStringBuilder.Clear();
-        }
-
     }
 }
