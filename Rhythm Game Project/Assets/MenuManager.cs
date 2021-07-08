@@ -20,24 +20,18 @@
 
         #region Private Fields
         private int currentMenuIndex = 0;
-        private int currentHoverMenuIndex = 0;
 
         private IEnumerator transitionToMenuCoroutine;
 
         private IMenu currentMenuScript;
 
         private StartMenuManager startMenuManager;
-        private ModeMenuManager modeMenuManager;
-        private AccountPanel accountPanel;
-        private LoginManager loginManager;
-        private SignupManager signupManager;
-        private TopCanvasManager topCanvasManager;
+        private OverlayCanvasManager overlayCanvasManager;
         private QuickplayMenuManager quickplayMenuManager;
         #endregion
 
         #region Properties
         public int CurrentMenuIndex => currentMenuIndex;
-        public int CurrentHoverMenuIndex => currentHoverMenuIndex;
         #endregion
 
         #region Public Methods
@@ -51,72 +45,6 @@
             currentMenuScript.OnMeasure();
         }
 
-        // ACCOUNT (needs changing)
-        public void TransitionStartMenuToAccountPanel()
-        {
-            accountPanel.TransitionIn();
-        }
-
-        public void TransitionAccountPanelToModeMenu()
-        {
-            accountPanel.TransitionOut();
-            modeMenuManager.TransitionIn();
-        }
-
-        public void TransitionAccountPanelToSignupPanel()
-        {
-            accountPanel.TransitionOutAccountOptionsPanel();
-            signupManager.TransitionIn();
-        }
-
-        public void TransitionSignupPanelToAccountPanel()
-        {
-            signupManager.TransitionOut();
-            accountPanel.TransitionInAccountOptionsPanel();
-        }
-
-        public void TransitionAccountPanelToLoginPanel()
-        {
-            accountPanel.TransitionOutAccountOptionsPanel();
-            loginManager.TransitionIn();
-        }
-
-        public void TransitionLoginPanelToAccountPanel()
-        {
-            loginManager.TransitionOut();
-            accountPanel.TransitionInAccountOptionsPanel();
-        }
-
-        public void TransitionSignupPanelToLoginPanel()
-        {
-            signupManager.TransitionOut();
-            loginManager.TransitionIn();
-        }
-
-        public void TransitionLoginPanelToModePanel()
-        {
-            loginManager.TransitionOut();
-            accountPanel.TransitionOut();
-            startMenuManager.TransitionOutStartAndAccountPanel();
-            modeMenuManager.TransitionIn();
-            topCanvasManager.TransitionInMenuOverlay();
-        }
-
-        public void TransitionSignupPanelToModePanel()
-        {
-            signupManager.TransitionOut();
-            accountPanel.TransitionOut();
-            startMenuManager.TransitionOutStartAndAccountPanel();
-            modeMenuManager.TransitionIn();
-            topCanvasManager.TransitionInMenuOverlay();
-        }
-
-        public void TransitionModePanelToQuickplayPanel()
-        {
-            modeMenuManager.TransitionOut();
-            quickplayMenuManager.TransitionIn();
-        }
-
         public void TransitionToMenu(int _menuIndex)
         {
             if (transitionToMenuCoroutine != null)
@@ -127,22 +55,13 @@
             transitionToMenuCoroutine = TransitionToMenuCoroutine(_menuIndex);
             StartCoroutine(transitionToMenuCoroutine);
         }
-
-        public void SetCurrentHoverMenuIndex(int _hoverMenuIndex)
-        {
-            currentHoverMenuIndex = _hoverMenuIndex;
-        }
         #endregion
 
         #region Private Methods
         private void Awake()
         {
             startMenuManager = FindObjectOfType<StartMenuManager>();
-            modeMenuManager = FindObjectOfType<ModeMenuManager>();
-            accountPanel = FindObjectOfType<AccountPanel>();
-            signupManager = FindObjectOfType<SignupManager>();
-            loginManager = FindObjectOfType<LoginManager>();
-            topCanvasManager = FindObjectOfType<TopCanvasManager>();
+            overlayCanvasManager = FindObjectOfType<OverlayCanvasManager>();
             quickplayMenuManager = FindObjectOfType<QuickplayMenuManager>();
         }
 
@@ -174,7 +93,7 @@
                     break;
             }
 
-            topCanvasManager.UpdateControlDescriptionText(currentMenuIndex);
+            //topCanvasManager.UpdateControlDescriptionText(currentMenuIndex);
 
             yield return null;
         }

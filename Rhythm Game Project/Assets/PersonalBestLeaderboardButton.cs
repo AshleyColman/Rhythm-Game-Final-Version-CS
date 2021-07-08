@@ -1,132 +1,110 @@
 ﻿namespace Menu
 {
+    using System.Collections;
     using TMPro;
     using UnityEngine;
     using UnityEngine.UI;
 
     public sealed class PersonalBestLeaderboardButton : MonoBehaviour
     {
-        #region Private Fields
-        [SerializeField] private GameObject contentPanel = default;
+        #region Constants
+        private byte scoreFieldButtonIndex = 0;
+        private byte comboFieldButtonIndex = 1;
+        private byte perfectFieldButtonIndex = 2;
+        private byte greatFieldButtonIndex = 3;
+        private byte okayFieldButtonIndex = 4;
+        private byte missFieldButtonIndex = 5;
+        private byte feverScoreFieldButtonIndex = 6;
+        private byte bonusScoreFieldButtonIndex = 7;
+        #endregion
 
-        [SerializeField] private Image profileImage = default;
+        #region Private Fields
+        [SerializeField] private FieldButton[] fieldButtonArr = default;
 
         [SerializeField] private TextMeshProUGUI positionText = default;
-        [SerializeField] private TextMeshProUGUI playerScoreComboText = default;
-        [SerializeField] private TextMeshProUGUI gradeText = default;
-        [SerializeField] private TextMeshProUGUI dateText = default;
-        [SerializeField] private TextMeshProUGUI noRecordSetText = default;
-        [SerializeField] private TextMeshProUGUI levelText = default;
-        [SerializeField] private TextMeshProUGUI perfectText = default;
-        [SerializeField] private TextMeshProUGUI greatText = default;
-        [SerializeField] private TextMeshProUGUI okayText = default;
-        [SerializeField] private TextMeshProUGUI missText = default;
-        [SerializeField] private TextMeshProUGUI accuracyText = default;
-        [SerializeField] private TextMeshProUGUI feverText = default;
-        [SerializeField] private TextMeshProUGUI bonusText = default;
+
+        [SerializeField] private ChallengeButtonPanel challengeButtonPanel = default;
+
+        private IEnumerator activateFieldButtonArray;
         #endregion
 
         #region Public Methods
-        public void DeactivateContentPanel()
+        public void DeactivatePersonalBest()
         {
-            if (contentPanel.gameObject.activeSelf == true)
+            for (byte i = 0; i < fieldButtonArr.Length; i++)
             {
-                contentPanel.gameObject.SetActive(false);
+                fieldButtonArr[i].DeactivateText();
             }
+
+            challengeButtonPanel.HideAllButtonText();
         }
 
-        public void ActivateContentPanel()
+        public void DisplayPersonalBest()
         {
-            if (contentPanel.gameObject.activeSelf == false)
+            ActivateFieldButtonArray();
+            challengeButtonPanel.ShowAllButtonText();
+        }
+
+        public void SetButtonText(string _scoreValueText, string _comboValueText, string _perfectValueText,
+            string _greatValueText, string _okayValueText, string _missValueText, string _feverScoreValueText,
+            string _bonusScoreValueText, string _positionText)
+        {
+            fieldButtonArr[scoreFieldButtonIndex].SetValueText(_scoreValueText);
+            fieldButtonArr[comboFieldButtonIndex].SetValueText(_comboValueText);
+            fieldButtonArr[perfectFieldButtonIndex].SetValueText(_perfectValueText);
+            fieldButtonArr[greatFieldButtonIndex].SetValueText(_greatValueText);
+            fieldButtonArr[okayFieldButtonIndex].SetValueText(_okayValueText);
+            fieldButtonArr[missFieldButtonIndex].SetValueText(_missValueText);
+            fieldButtonArr[feverScoreFieldButtonIndex].SetValueText(_feverScoreValueText);
+            fieldButtonArr[bonusScoreFieldButtonIndex].SetValueText(_bonusScoreValueText);
+            positionText.SetText(_positionText);
+        }
+
+        public void SetButtonTextNoRecord()
+        {
+            string noRecordText = "-";
+
+            for (byte i = 0; i < fieldButtonArr.Length; i++)
             {
-                contentPanel.gameObject.SetActive(true);
+                fieldButtonArr[i].SetValueText(noRecordText);
+
             }
+
+            positionText.SetText(string.Empty);
         }
 
-        public void DeactivateNoRecordSetText()
+        public void SetChallengeButtonPanelVisual(string _clearPoints, string _hiddenPoints, string _minePoints,
+            string _lowApproachRatePoints, string _highApproachRatePoints, string _fullComboPoints, string _maxPercentagePoints)
         {
-            if (noRecordSetText.gameObject.activeSelf == true)
+            challengeButtonPanel.SetAllButtonVisual(_clearPoints, _hiddenPoints, _minePoints, _lowApproachRatePoints,
+                _highApproachRatePoints, _fullComboPoints, _maxPercentagePoints);
+        }
+        #endregion
+
+        #region Private Methods
+        private void ActivateFieldButtonArray()
+        {
+            if (activateFieldButtonArray != null)
             {
-                noRecordSetText.gameObject.SetActive(false);
+                StopCoroutine(activateFieldButtonArray);
             }
+
+            activateFieldButtonArray = ActivateFieldButtonArrayCoroutine();
+            StartCoroutine(activateFieldButtonArray);
         }
 
-        public void ActivateNoRecordText()
+        private IEnumerator ActivateFieldButtonArrayCoroutine()
         {
-            if (noRecordSetText.gameObject.activeSelf == false)
+            WaitForSeconds waitForSeconds = new WaitForSeconds(0.1f);
+            
+            for (byte i = 0; i < fieldButtonArr.Length; i++)
             {
-                noRecordSetText.gameObject.SetActive(true);
+                fieldButtonArr[i].ActivateText();
+
+                yield return waitForSeconds;
             }
-        }
 
-        public void SetProfileImage(Texture _texture)
-        {
-        }
-
-        public void SetNewProfileImageMaterial(Material _material)
-        {
-            profileImage.material = _material;
-        }
-
-        public void SetPositionText(string _text)
-        {
-            positionText.SetText(_text);
-        }
-
-        public void SetLevelText(string _text)
-        {
-            levelText.SetText(_text);
-        }
-
-        public void SetGradeText(string _text, TMP_ColorGradient _color)
-        {
-            gradeText.SetText(_text);
-            gradeText.colorGradientPreset = _color;
-        }
-
-        public void SetDateText(string _text)
-        {
-            dateText.SetText(_text);
-        }
-
-        public void SetPlayerScoreComboText(string _text)
-        {
-            playerScoreComboText.SetText(_text);
-        }
-
-        public void SetPerfectText(string _text)
-        {
-            perfectText.SetText(_text);
-        }
-
-        public void SetGreatText(string _text)
-        {
-            greatText.SetText(_text);
-        }
-
-        public void SetOkayText(string _text)
-        {
-            okayText.SetText(_text);
-        }
-
-        public void SetMissText(string _text)
-        {
-            missText.SetText(_text);
-        }
-
-        public void SetAccuracyText(string _text)
-        {
-            accuracyText.SetText(_text);
-        }
-
-        public void SetFeverText(string _text)
-        {
-            feverText.SetText(_text);
-        }
-
-        public void SetBonusText(string _text)
-        {
-            bonusText.SetText(_text);
+            yield return null;
         }
         #endregion
     }

@@ -25,7 +25,7 @@
         #region Public Methods
         public void TransitionIn()
         {
-            descriptionPanel.PlayDefaultDescriptionArr();
+            //descriptionPanel.PlayDefaultDescriptionArr();
             quickplayScreen.gameObject.SetActive(true);
             beatmapSelectManager.TransitionIn();
             UpdateCurrentMenuScript(beatmapSelectManager);

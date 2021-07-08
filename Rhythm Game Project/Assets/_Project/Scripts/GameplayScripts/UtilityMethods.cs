@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using UnityEngine.UI;
 
 public static class UtilityMethods
 {
@@ -66,6 +67,12 @@ public static class UtilityMethods
         return time;
     }
 
+    public static string GetTimeFromFloat(float _value)
+    {
+        TimeSpan timeSpan = TimeSpan.FromSeconds(_value);
+        return timeSpan.ToString();
+    }
+
     public static string AddZerosToScoreString(string _string)
     {
         switch (_string.Length)
@@ -98,12 +105,6 @@ public static class UtilityMethods
         return _string;
     }
 
-    public static float GetSliderValuePercentageFromTime(float _audioStartTime, float _audioClipLength)
-    {
-        float percentage = (_audioStartTime / _audioClipLength) * 100;
-        return percentage;
-    }
-
     public static float GetAverageFromNumberArr(float[] _numberArr)
     {
         int totalIncrements = 0;
@@ -128,5 +129,29 @@ public static class UtilityMethods
         }
 
         return average;
+    }
+
+    public static float GetSliderValuePercentageFromTime(float _audioStartTime, float _audioClipLength)
+    {
+        float percentage = (_audioStartTime / _audioClipLength) * 100;
+        return percentage;
+    }
+
+    public static bool GetBoolFromString(string _string)
+    {
+        if (_string == "1")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static void SelectNextSelectable(Selectable _currentSelectable)
+    {
+        Selectable selectable = _currentSelectable.navigation.selectOnRight;
+        selectable.Select();
     }
 }

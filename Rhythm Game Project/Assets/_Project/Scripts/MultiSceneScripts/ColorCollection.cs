@@ -12,6 +12,7 @@ public sealed class ColorCollection : MonoBehaviour
     [SerializeField] Color32 pinkColor = default, pinkColor080 = default;
     [SerializeField] Color32 yellowColor = default, yellowColor080 = default;
     [SerializeField] Color32 lightGreenColor = default, lightGreenColor080 = default;
+    [SerializeField] Color32 greyColor05 = default;
 
     [SerializeField] Color32[] testHitObjectColorArray = default; // TEST
     #endregion
@@ -37,6 +38,7 @@ public sealed class ColorCollection : MonoBehaviour
     public Color32 WhiteColor => whiteColor;
     public Color32 WhiteColor080 => whiteColor080;
     public Color32 WhiteColor025 => whiteColor025;
+    public Color32 GreyColor05 => greyColor05;
     #endregion
 
     #region Public Methods

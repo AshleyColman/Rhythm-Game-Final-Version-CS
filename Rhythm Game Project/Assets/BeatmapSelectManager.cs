@@ -14,7 +14,7 @@
     using Audio;
     using Background;
     using SceneLoading;
-    using Profile;
+    using Player;
     using ImageLoad;
 
     public sealed class BeatmapSelectManager : MonoBehaviour, IMenu
@@ -177,17 +177,7 @@
             backgroundManager.TransitionAndLoadNewImage(_imageTexture);
             SetSongSlider(_beatmapButtonIndex);
             menuAudioManager.LoadSongAudioClipFromFile($"{fileManager.BeatmapDirectories[_beatmapButtonIndex]}", _audioStartTime,
-                menuTimeManager);
-
-            yield return waitForSeconds;
-
-            songSlider.LerpSliderToValue(songSlider.SongTimeSliderValue,
-                UtilityMethods.GetSliderValuePercentageFromTime(_audioStartTime, menuAudioManager.SongAudioSource.clip.length),
-                MenuAudioManager.AudioClipLoadDelayDuration);
-
-            yield return waitForSeconds;
-
-            songSlider.UpdateSongSliderProgress();
+                menuTimeManager, songSlider);
             yield return null;
         }
 
@@ -284,7 +274,7 @@
             TMP_ColorGradient gradeColor = gradeData.GetCurrentGradeGradient(fileManager.Beatmap.PlayerDifficultyGrade);
 
             // Check if the player name saved on the beatmap matches the current signed in user to confirm grade achieved.
-            if (ProfileManager.Username == fileManager.Beatmap.PlayerDifficultyGradeUsername)
+            if (Player.Username == fileManager.Beatmap.PlayerDifficultyGradeUsername)
             {
                 beatmapButtonList[_index].SetDifficultyGradeTrue(_difficulty, fileManager.Beatmap.PlayerDifficultyGrade,
                     fileManager.Beatmap.DifficultyAccuracy, gradeColor);
@@ -357,7 +347,8 @@
 
         private void DisplayBeatmapCountNotification()
         {
-            notification.DisplayNotification(NotificationType.General, $"{fileManager.BeatmapDirectories.Length} beatmaps found", 4f);
+            notification.DisplayTitleNotification(ColorName.LIGHT_BLUE, $"{fileManager.BeatmapDirectories.Length} beatmaps found",
+                4f);
         }
 
         private void SetSongSlider(int _beatmapButtonIndex)

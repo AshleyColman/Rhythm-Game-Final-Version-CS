@@ -5,6 +5,8 @@
     using Audio;
     using TMPro;
     using SceneLoading;
+    using Background;
+    using UnityEngine.UI;
 
     public sealed class StartMenuManager : MonoBehaviour, IMenu
     {
@@ -12,24 +14,28 @@
         private const float StartSongBeatsPerMinute = 191f;
         private const float TimeToPlayAudio = 1f;
 
-        private const double StartSongOffsetMilliseconds = 1000; //1283.00;
-
-        private readonly Vector3 titleScaleTo = new Vector3(1.25f, 1.25f, 1f);
-        private readonly Vector3 titleEffectScaleTo = new Vector3(1.75f, 1.75f, 1f);
+        private const double StartSongOffsetMilliseconds = 1000;
         #endregion
 
         #region Private Fields
-        [SerializeField] private GameObject startupScreen = default;
-        [SerializeField] private GameObject startAndAccountPanel = default;
+        [SerializeField] private GameObject startMenuScreen = default;
 
-        [SerializeField] private TextMeshProUGUI titleText = default;
-        [SerializeField] private TextMeshProUGUI titleEffectText = default;
-        [SerializeField] private TextMeshProUGUI startText = default;
+        [SerializeField] private Canvas startPanel = default;
 
-        private Transform titleTextCachedTransform;
-        private Transform titleEffectTextCachedTransform;
+        [SerializeField] private TextMeshProUGUI rhythmText = default;
+        [SerializeField] private TextMeshProUGUI rhythmEffectText = default;
+        [SerializeField] private TextMeshProUGUI fadeText = default;
+        [SerializeField] private TextMeshProUGUI fadeEffectText = default;
 
-        [SerializeField] private CanvasGroup startTextCanvasGroup = default;
+        [SerializeField] private CanvasGroup fadeTextCanvasGroup = default;
+
+        [SerializeField] private Image backgroundImage = default;
+
+        private Transform rhythmTextTransform;
+        private Transform rhythmEffectTextTransform;
+        private Transform fadeTextTransform;
+        private Transform fadeEffectTextTransform;
+        private Transform backgroundImageTransform;
 
         private bool anyKeyHasBeenPressed = false;
 
@@ -37,22 +43,29 @@
         private IEnumerator prepareToStartAudioAndTimerCoroutine;
         private IEnumerator checkToStartGameCoroutine;
         private IEnumerator startGameCoroutine;
+        private IEnumerator transitionInCoroutine;
+        private IEnumerator setRhythmAndFadeTextWithTypingAnimationCoroutine;
 
         private MenuAudioManager menuAudioManager;
         private MenuTimeManager menuTimeManager;
         private Transition transition;
-        private MenuManager menuManager;
-        private ModeMenuManager modeMenuManager;
+        private TextTyper textTyper;
+        private AccountPanel accountPanel;
+        private DescriptionPanel descriptionPanel;
+        private ControlPanel controlPanel;
+        private BackgroundManager backgroundManager;
         #endregion
 
         #region Public Methods
         public void TransitionIn()
         {
-            startupScreen.gameObject.SetActive(true);
-            PrepareToStartAudioAndTimer();
-            PlayStartCanvasGroupTween();
-            transition.PlayFadeInTween();
-            CheckToStartGame();
+            if (transitionInCoroutine != null)
+            {
+                StopCoroutine(transitionInCoroutine);
+            }
+
+            transitionInCoroutine = TransitionInCoroutine();
+            StartCoroutine(transitionInCoroutine);
         }
 
         public void TransitionOut()
@@ -66,6 +79,11 @@
             StartCoroutine(transitionOutCoroutine);
         }
 
+        public void TransitionOutStartPanel()
+        {
+            startPanel.gameObject.SetActive(false);
+        }
+
         public void OnTick()
         {
 
@@ -73,12 +91,19 @@
 
         public void OnMeasure()
         {
-            PlayTitleRhythmTween();
+            PlayRhythmTextTween();
         }
 
-        public void TransitionOutStartAndAccountPanel()
+        public void SetRhythmAndFadeTextWithTypingAnimation(string _rhythmTextString, string _fadeTextString)
         {
-            startAndAccountPanel.gameObject.SetActive(false);
+            if (setRhythmAndFadeTextWithTypingAnimationCoroutine != null)
+            {
+                StopCoroutine(setRhythmAndFadeTextWithTypingAnimationCoroutine);
+            }
+
+            setRhythmAndFadeTextWithTypingAnimationCoroutine = SetRhythmAndFadeTextWithTypingAnimationCoroutine(_rhythmTextString,
+                _fadeTextString);
+            StartCoroutine(setRhythmAndFadeTextWithTypingAnimationCoroutine);
         }
         #endregion
 
@@ -88,37 +113,71 @@
             menuAudioManager = FindObjectOfType<MenuAudioManager>();
             menuTimeManager = FindObjectOfType<MenuTimeManager>();
             transition = FindObjectOfType<Transition>();
-            menuManager = FindObjectOfType<MenuManager>();
-            modeMenuManager = FindObjectOfType<ModeMenuManager>();
+            textTyper = FindObjectOfType<TextTyper>();
+            accountPanel = FindObjectOfType<AccountPanel>();
+            descriptionPanel = FindObjectOfType<DescriptionPanel>();
+            controlPanel = FindObjectOfType<ControlPanel>();
+            backgroundManager = FindObjectOfType<BackgroundManager>();
+
+            SetTransforms();
             menuTimeManager.SetTimingDetails(StartSongBeatsPerMinute, StartSongOffsetMilliseconds);
             menuTimeManager.UpdateTimingPosition();
-            SetTitleTextTransforms();
+            backgroundManager.SetNewImageReferences(new Image[] { backgroundImage });
         }
 
-        private void PlayTitleRhythmTween()
+        private void PlayRhythmTextTween()
         {
-            LeanTween.cancel(titleText.gameObject);
-            LeanTween.cancel(titleEffectText.gameObject);
-            titleTextCachedTransform.localScale = Vector3.one;
-            titleEffectTextCachedTransform.localScale = Vector3.one;
+            LeanTween.cancel(rhythmText.gameObject);
+            LeanTween.cancel(rhythmEffectText.gameObject);
+            rhythmTextTransform.localScale = Vector3.one;
+            rhythmEffectTextTransform.localScale = Vector3.one;
 
-            LeanTween.scale(titleText.gameObject, titleScaleTo, 1f).setEasePunch();
-            LeanTween.scale(titleEffectText.gameObject, titleEffectScaleTo, 1f).setEasePunch();
+            LeanTween.scale(rhythmText.gameObject, VectorConstants.Vector125, 1f).setEasePunch();
+            LeanTween.scale(rhythmEffectText.gameObject, VectorConstants.Vector175, 1f).setEasePunch();
+        }
+
+        private IEnumerator TransitionInCoroutine()
+        {
+            rhythmText.SetText(string.Empty);
+            rhythmEffectText.SetText(string.Empty);
+            fadeText.SetText(string.Empty);
+            fadeEffectText.SetText(string.Empty);
+
+            startMenuScreen.gameObject.SetActive(true);
+            startPanel.gameObject.SetActive(true);
+            PrepareToStartAudioAndTimer();
+            transition.PlayFadeInTween();
+            PlayFadeTextCanvasGroupAnimation();
+
+            yield return new WaitForSeconds(Transition.TransitionDuration);
+
+            string rhythmTextString = "project dia";
+            textTyper.TypeTextNoCancel(rhythmTextString, rhythmText, rhythmEffectText);
+            yield return new WaitForSeconds(textTyper.GetTextTypeDuration(rhythmTextString));
+            string fadeTextString = "press any key to start";
+            textTyper.TypeTextNoCancel(fadeTextString, fadeText, fadeEffectText);
+            yield return new WaitForSeconds(textTyper.GetTextTypeDuration(fadeTextString));
+
+            CheckToStartGame();
+
+            yield return null;
         }
 
         private IEnumerator TransitionOutCoroutine()
         {
             transition.PlayFadeOutTween();
             yield return new WaitForSeconds(Transition.TransitionDuration);
-            startupScreen.gameObject.SetActive(false);
-            modeMenuManager.TransitionOut();
+            startMenuScreen.gameObject.SetActive(false);
             yield return null;
         }
 
-        private void SetTitleTextTransforms()
+        private void SetTransforms()
         {
-            titleTextCachedTransform = titleText.transform;
-            titleEffectTextCachedTransform = titleEffectText.transform;
+            rhythmTextTransform = rhythmText.transform;
+            rhythmEffectTextTransform = rhythmText.transform;
+            fadeTextTransform = fadeText.transform;
+            fadeEffectTextTransform = fadeEffectText.transform;
+            backgroundImageTransform = backgroundImage.transform;
         }
 
         private void PrepareToStartAudioAndTimer()
@@ -141,20 +200,23 @@
             yield return null;
         }
 
-        private void PlayStartCanvasGroupTween()
+        private void PlayFadeTextCanvasGroupAnimation()
         {
-            LeanTween.alphaCanvas(startTextCanvasGroup, 0f, 1f).setLoopPingPong(-1);
+            LeanTween.alphaCanvas(fadeTextCanvasGroup, 0f, 1f).setLoopPingPong(-1);
         }
 
-        private void CancelStartCanvasGroupTween()
+        private void CancelFadeTextCanvasGroupAnimation()
         {
-            LeanTween.cancel(startTextCanvasGroup.gameObject);
+            LeanTween.cancel(fadeTextCanvasGroup.gameObject);
         }
 
-        private void PlayStartGameStartedCanvasGroupTween()
+        private void PlayGameStartedAnimation()
         {
-            startTextCanvasGroup.alpha = 1f;
-            LeanTween.alphaCanvas(startTextCanvasGroup, 0f, 0.25f).setLoopPingPong(4);
+            fadeTextCanvasGroup.alpha = 1f;
+            LeanTween.alphaCanvas(fadeTextCanvasGroup, 0f, 0.25f).setLoopPingPong(5);
+
+            LeanTween.scale(fadeText.gameObject, VectorConstants.Vector125, 1f).setEasePunch();
+            LeanTween.scale(fadeEffectText.gameObject, VectorConstants.Vector175, 1f).setEasePunch();
         }
 
         private void CheckToStartGame()
@@ -175,6 +237,7 @@
                 if (Input.anyKeyDown)
                 {
                     StartGame();
+                    break;
                 }
                 yield return null;
             }
@@ -196,11 +259,30 @@
         private IEnumerator StartGameCoroutine()
         {
             anyKeyHasBeenPressed = true;
-            CancelStartCanvasGroupTween();
-            PlayStartGameStartedCanvasGroupTween();
-            startText.SetText("game started");
+            CancelFadeTextCanvasGroupAnimation();
+            PlayGameStartedAnimation();
+       
+            textTyper.TypeTextNoCancel("game started", rhythmText, rhythmEffectText);
+            textTyper.TypeTextNoCancel("welcome", fadeText, fadeEffectText);
             yield return new WaitForSeconds(2f);
-            menuManager.TransitionStartMenuToAccountPanel();
+
+            accountPanel.TransitionIn();
+            descriptionPanel.TransitionIn();
+            controlPanel.TransitionIn();
+        }
+
+        private void SetFadeText(string _text)
+        {
+            fadeText.SetText(_text);
+            fadeEffectText.SetText(_text);
+        }
+
+        private IEnumerator SetRhythmAndFadeTextWithTypingAnimationCoroutine(string _rhythmTextString, string _fadeTextString)
+        {
+            textTyper.TypeTextNoCancel(_rhythmTextString, rhythmText, rhythmEffectText);
+            yield return new WaitForSeconds(textTyper.GetTextTypeDuration(_rhythmTextString));
+            textTyper.TypeTextNoCancel(_fadeTextString, fadeText, fadeEffectText);
+            yield return null;
         }
         #endregion
     }

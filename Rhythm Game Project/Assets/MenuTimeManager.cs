@@ -40,7 +40,7 @@
         protected override void OnMeasure()
         {
             base.OnMeasure();
-            backgroundManager.PlayRhythmScaleTween();
+            backgroundManager.PlayImageScaleTween();
             flashManager.PlayFlashTween(1f);
             menuManager.PlayCurrentMenuOnMeasure();
         }

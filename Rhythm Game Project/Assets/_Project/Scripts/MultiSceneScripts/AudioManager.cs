@@ -22,12 +22,16 @@
         private float songAudioSourceVolume = 1f;
         private float userInterfaceAudioSourceVolume = 1f;
 
+        private bool hasPaused = false;
+
         [SerializeField] private AudioSource songAudioSource = default;
         [SerializeField] private AudioSource userInterfaceAudioSource = default;
 
         [SerializeField] private AudioClip[] userInterfaceAudioClipArray = default;
 
         private IEnumerator loadSongAudioClipFromFileCoroutine;
+        private IEnumerator checkToLoopAudioCoroutine;
+        private IEnumerator playAudioAndTimeManagerFromStartTimeCoroutine;
 
         private TimeManager timeManager;
         private Notification notification;
@@ -55,7 +59,8 @@
             userInterfaceAudioSource.PlayOneShot(userInterfaceAudioClipArray[_clipIndex], userInterfaceAudioSourceVolume);
         }
 
-        public void LoadSongAudioClipFromFile(string _beatmapFolderPath, float _audioStartTime, TimeManager timeManager)
+        public void LoadSongAudioClipFromFile(string _beatmapFolderPath, float _audioStartTime, TimeManager timeManager,
+            SongSlider _songSlider)
         {
             if (loadSongAudioClipFromFileCoroutine != null)
             {
@@ -63,7 +68,7 @@
             }
 
             loadSongAudioClipFromFileCoroutine = LoadSongAudioClipFromFileCoroutine(_beatmapFolderPath, _audioStartTime,
-                timeManager);
+                timeManager, _songSlider);
             StartCoroutine(loadSongAudioClipFromFileCoroutine);
         }
         #endregion
@@ -78,7 +83,7 @@
         }
 
         private IEnumerator LoadSongAudioClipFromFileCoroutine(string _beatmapFolderPath, float _audioStartTime, 
-            TimeManager _timeManager)
+            TimeManager _timeManager, SongSlider _songSlider)
         {
             DeactivateSongAudioSource();
             UnloadSongAudioClip();
@@ -105,12 +110,22 @@
                         else
                         {
                             songAudioSource.clip = DownloadHandlerAudioClip.GetContent(www);
+
                             yield return new WaitForSeconds(AudioClipLoadDelayDuration);
-                            ActivateSongAudioSource();
-                            PlayScheduledSongAudio(AudioClipLoadDelayDuration);
-                            SetAudioStartTime(_audioStartTime);
+
+                            PlayAudioAndTimeManagerFromStartTime(_audioStartTime, _timeManager);
+
                             yield return new WaitForSeconds(AudioClipLoadDelayDuration);
-                            _timeManager.RecalculateAndPlayFromNewPosition();
+
+                            _songSlider.LerpSliderToValue(UtilityMethods.GetSliderValuePercentageFromTime(_audioStartTime, 
+                                songAudioSource.clip.length), AudioClipLoadDelayDuration);
+
+                            yield return new WaitForSeconds(AudioClipLoadDelayDuration);
+
+                            _songSlider.UpdateSongSliderProgress();
+
+                            yield return new WaitForSeconds(AudioClipLoadDelayDuration);
+
                             hasLoadedAudioFile = true;
                         }
                     }
@@ -124,7 +139,7 @@
                         if (i == FileTypes.AudioFileTypesArray.Length)
                         {
                             DeactivateSongAudioSource();
-                            DisplayErrorNotification();
+                            DisplayErrorNotification(audioFilePath);
                         }
                         continue;
                     }
@@ -132,9 +147,65 @@
             }
             else
             {
-                DisplayErrorNotification();
+                DisplayErrorNotification("beatmap folder path null");
             }
 
+            yield return null;
+        }
+
+        private void CheckToLoopAudio()
+        {
+            if (checkToLoopAudioCoroutine != null)
+            {
+                StopCoroutine(checkToLoopAudioCoroutine);
+            }
+
+            checkToLoopAudioCoroutine = CheckToLoopAudioCoroutine();
+            StartCoroutine(checkToLoopAudioCoroutine);
+        }
+
+        private IEnumerator CheckToLoopAudioCoroutine()
+        {
+            while (songAudioSource.gameObject.activeSelf == true)
+            {
+                CheckIfAudioHasReachedEndOfClip();
+                yield return null;
+            }
+            yield return null;
+        }
+
+        private void CheckIfAudioHasReachedEndOfClip()
+        {
+            if (songAudioSource.isPlaying == false)
+            {
+                if (hasPaused == false)
+                {
+                    PlayAudioAndTimeManagerFromStartTime(0f, timeManager);
+                }
+            }
+        }
+
+        private void PlayAudioAndTimeManagerFromStartTime(float _audioStartTime, TimeManager _timeManager)
+        {
+            if (playAudioAndTimeManagerFromStartTimeCoroutine != null)
+            {
+                StopCoroutine(playAudioAndTimeManagerFromStartTimeCoroutine);
+            }
+
+            playAudioAndTimeManagerFromStartTimeCoroutine = PlayAudioAndTimeManagerFromStartTimeCoroutine(_audioStartTime,
+                _timeManager);
+
+            StartCoroutine(playAudioAndTimeManagerFromStartTimeCoroutine);
+        }
+
+        private IEnumerator PlayAudioAndTimeManagerFromStartTimeCoroutine(float _audioStartTime, TimeManager _timeManager)
+        {
+            ActivateSongAudioSource();
+            PlayScheduledSongAudio(AudioClipLoadDelayDuration);
+            SetAudioStartTime(_audioStartTime);
+            yield return new WaitForSeconds(AudioClipLoadDelayDuration);
+            _timeManager.RecalculateAndPlayFromNewPosition();
+            CheckToLoopAudio();
             yield return null;
         }
 
@@ -145,7 +216,10 @@
 
         private void ActivateSongAudioSource()
         {
-            songAudioSource.gameObject.SetActive(true);
+            if (songAudioSource.gameObject.activeSelf == false)
+            {
+                songAudioSource.gameObject.SetActive(true);
+            }
         }
 
         private void UnloadSongAudioClip()
@@ -157,9 +231,9 @@
             }
         }
 
-        private void DisplayErrorNotification()
+        private void DisplayErrorNotification(string _error)
         {
-            notification.DisplayNotification(NotificationType.Error, "error loading audio", 4f);
+            notification.DisplayDescriptionNotification(ColorName.RED, "error loading beatmap audio", _error, 4f);
         }
         #endregion
     }

@@ -43,7 +43,7 @@
         {
             base.OnMeasure();
 
-            backgroundManager.PlayRhythmScaleTween();
+            backgroundManager.PlayImageScaleTween();
         }
         #endregion
     }

@@ -18,12 +18,10 @@
 
         [SerializeField] private Image colorImage = default;
 
-        [SerializeField] private CanvasGroup flashCanvasGroup = default;
+        [SerializeField] private FlashCanvasGroup flashCanvasGroup = default;
 
         private Transform keyTextTransform;
         private Transform keyEffectTextTransform;
-
-        private IEnumerator playButtonSelectedAnimation;
         #endregion
 
         #region Public Methods
@@ -57,30 +55,7 @@
 
         public void PlayButtonSelectedAnimation()
         {
-            if (playButtonSelectedAnimation != null)
-            {
-                StopCoroutine(playButtonSelectedAnimation);
-            }
-
-            playButtonSelectedAnimation = PlayButtonSelectedAnimationCoroutine();
-            StartCoroutine(playButtonSelectedAnimation);
-        }
-        #endregion
-
-        #region Private Methods
-        private IEnumerator PlayButtonSelectedAnimationCoroutine()
-        {
-            flashCanvasGroup.alpha = 0f;
-            LeanTween.cancel(flashCanvasGroup.gameObject);
-            flashCanvasGroup.gameObject.SetActive(true);
-
-            LeanTween.alphaCanvas(flashCanvasGroup, 1f, 1f).setEasePunch();
-
-            yield return new WaitForSeconds(1f);
-
-            flashCanvasGroup.gameObject.SetActive(false);
-
-            yield return null;
+            flashCanvasGroup.PlayFlashAnimation();
         }
         #endregion
     }

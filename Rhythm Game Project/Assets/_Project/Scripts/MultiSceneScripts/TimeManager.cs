@@ -26,12 +26,12 @@
         #region Protected Fields
         private float beatsPerMinute = 120f;
 
-        [SerializeField] private double songTime = 0;
+        private double songTime = 0;
         private double offsetMilliseconds = 0f;
 
         private bool timerStarted = false;
         #endregion
-
+        
         #region Properties
         public double SongTime => songTime;
         protected float BeatsPerMinute { get => beatsPerMinute; set => beatsPerMinute = value; }

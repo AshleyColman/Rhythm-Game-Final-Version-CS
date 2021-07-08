@@ -1,30 +1,28 @@
 ﻿namespace Background
 {
+    using ImageLoad;
+    using Loading;
+    using System;
     using System.Collections;
     using UnityEngine;
     using UnityEngine.UI;
-    using Loading;
-    using ImageLoad;
 
     public sealed class BackgroundManager : MonoBehaviour
     {
         #region Constants
-        private readonly Vector3 scaleTo = new Vector3(1.01f, 1.01f, 1f);
-
         private const float FadeDuration = 0.5f;
         #endregion
 
         #region Private Fields
-        [SerializeField] private LoadingIcon loadingIcon = default;
+        [SerializeField] private readonly LoadingIcon loadingIcon = default;
 
-        [SerializeField] private CanvasGroup[] backgroundImageCanvasGroupArray = default;
+        [SerializeField] private CanvasGroup[] imageCanvasGroupArr = default;
 
-        [SerializeField] private Image[] backgroundImageArray = default;
+        [SerializeField] private Image[] imageArr = default;
 
-        private Transform[] backgroundImageCachedTransformArray = default;
+        private Transform[] imageTransformArr = default;
 
-        private byte activeBackgroundImageIndex = 0;
-        private byte previousbackgroundImageIndex = 1;
+        private int activeImageIndex = 0;
 
         private ImageLoader imageLoader;
 
@@ -32,11 +30,47 @@
         #endregion
 
         #region Public Methods
-        public void PlayRhythmScaleTween()
+        public void SetNewImageReferences(Image[] _imageArr)
         {
-            LeanTween.cancel(backgroundImageArray[activeBackgroundImageIndex].gameObject);
-            backgroundImageCachedTransformArray[activeBackgroundImageIndex].localScale = Vector3.one;
-            LeanTween.scale(backgroundImageArray[activeBackgroundImageIndex].gameObject, scaleTo, 1f).setEasePunch();
+            if (imageArr.Length != 0)
+            {
+                Array.Clear(imageArr, 0, imageArr.Length);
+                Array.Clear(imageTransformArr, 0, imageTransformArr.Length);
+                Array.Clear(imageCanvasGroupArr, 0, imageCanvasGroupArr.Length);
+            }
+
+            imageArr = new Image[_imageArr.Length];
+            imageTransformArr = new Transform[_imageArr.Length];
+            imageCanvasGroupArr = new CanvasGroup[_imageArr.Length];
+
+            for (int i = 0; i < _imageArr.Length; i++)
+            {
+                imageArr[i] = _imageArr[i];
+                imageTransformArr[i] = _imageArr[i].transform;
+                imageCanvasGroupArr[i] = _imageArr[i].GetComponent<CanvasGroup>();
+            }
+
+            ResetActiveIndex();
+        }
+
+        public void PlayImageScaleTween(Vector3 _startScale, Vector3 _scaleTo, float _duration)
+        {
+            if (imageArr.Length != 0)
+            {
+                LeanTween.cancel(imageArr[activeImageIndex].gameObject);
+                imageTransformArr[activeImageIndex].localScale = _startScale;
+                LeanTween.scale(imageArr[activeImageIndex].gameObject, _scaleTo, _duration).setEaseOutExpo();
+            }
+        }
+
+        public void PlayImageScaleTween()
+        {
+            //if (imageArr.Length != 0)
+            //{
+            //    LeanTween.cancel(imageArr[activeImageIndex].gameObject);
+            //    imageTransformArr[activeImageIndex].localScale = Vector3.one;
+            //    LeanTween.scale(imageArr[activeImageIndex].gameObject, VectorConstants.Vector101, 1f).setEasePunch();
+            //}
         }
 
         public void TransitionAndLoadNewImage(Texture _imageTexture)
@@ -49,65 +83,62 @@
             transitionAndLoadNewImageCoroutine = TransitionAndLoadNewImageCoroutine(_imageTexture);
             StartCoroutine(transitionAndLoadNewImageCoroutine);
         }
+
+        public void TransitionToImageFromIndex(int _index)
+        {
+            imageArr[activeImageIndex].gameObject.SetActive(false);
+            SetActiveIndex(_index);
+            imageArr[activeImageIndex].gameObject.SetActive(true);
+        }
         #endregion
 
         #region Private Methods
         private void Awake()
         {
             imageLoader = FindObjectOfType<ImageLoader>();
-            SetCachedTransforms();
-        }
-
-        private void SetCachedTransforms()
-        {
-            backgroundImageCachedTransformArray = new Transform[backgroundImageArray.Length];
-
-            for (byte i = 0; i < backgroundImageArray.Length; i++)
-            {
-                backgroundImageCachedTransformArray[i] = backgroundImageArray[i].transform;
-            }
         }
 
         private IEnumerator TransitionAndLoadNewImageCoroutine(Texture _imageTexture)
         {
-            WaitForSeconds waitForSeconds = new WaitForSeconds(FadeDuration);
+            //WaitForSeconds waitForSeconds = new WaitForSeconds(FadeDuration);
 
-            // Cancel current tweens.
-            for (byte i = 0; i < backgroundImageCanvasGroupArray.Length; i++)
-            {
-                LeanTween.cancel(backgroundImageCanvasGroupArray[i].gameObject);
-            }
+            //// Cancel current tweens.
+            //for (int i = 0; i < imageCanvasGroupArr.Length; i++)
+            //{
+            //    LeanTween.cancel(imageCanvasGroupArr[i].gameObject);
+            //}
 
-            // Activate previous active Image.
-            backgroundImageArray[previousbackgroundImageIndex].gameObject.SetActive(true);
+            //// Activate previous active Image.
+            //imageArr[previousbackgroundImageIndex].gameObject.SetActive(true);
 
-            // Fade images.
-            LeanTween.alphaCanvas(backgroundImageCanvasGroupArray[activeBackgroundImageIndex], 0f, FadeDuration);
-            UpdateCurrentActiveImage();
-            LeanTween.alphaCanvas(backgroundImageCanvasGroupArray[activeBackgroundImageIndex], 1f, FadeDuration);
+            //// Fade images.
+            //LeanTween.alphaCanvas(backgroundImageCanvasGroupArray[activeImageIndex], 0f, FadeDuration);
+            //UpdateCurrentActiveImage();
+            //LeanTween.alphaCanvas(backgroundImageCanvasGroupArray[activeImageIndex], 1f, FadeDuration);
 
-            // Set new image texture.
-            backgroundImageArray[activeBackgroundImageIndex].material.mainTexture = _imageTexture;
+            //// Set new image texture.
+            //imageArr[activeImageIndex].material.mainTexture = _imageTexture;
 
-            yield return waitForSeconds;
+            //yield return waitForSeconds;
 
-            // Deactivate non active image.
-            backgroundImageArray[previousbackgroundImageIndex].gameObject.SetActive(false);
+            //// Deactivate non active image.
+            //imageArr[previousbackgroundImageIndex].gameObject.SetActive(false);
             yield return null;
         }
 
-        private void UpdateCurrentActiveImage()
+        private void LoadNewImageFromTexture(Texture2D _texture)
         {
-            if (activeBackgroundImageIndex == 0)
-            {
-                previousbackgroundImageIndex = 0;
-                activeBackgroundImageIndex = 1;
-            }
-            else if (activeBackgroundImageIndex == 1)
-            {
-                previousbackgroundImageIndex = 1;
-                activeBackgroundImageIndex = 0;
-            }
+            imageArr[activeImageIndex].material.mainTexture = _texture;
+        }
+
+        private void ResetActiveIndex()
+        {
+            activeImageIndex = 0;
+        }
+
+        private void SetActiveIndex(int _index)
+        {
+            activeImageIndex = _index;  
         }
         #endregion
     }

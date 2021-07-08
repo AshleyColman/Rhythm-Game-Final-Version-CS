@@ -82,12 +82,6 @@
             beatmap.HasTypeArray = new bool[1];
             beatmap.HasTypeArray[0] = true;
 
-            beatmap.StandardClear = true;
-            beatmap.HiddenClear = false;
-            beatmap.MinesClear = true;
-            beatmap.FullCombo = false;
-            beatmap.MaxPercentage = false;
-
             beatmap.ApproachRate = 10;
             beatmap.ObjectSize = 10;
             beatmap.HealthDrain = 10;
@@ -130,12 +124,6 @@
             beatmap.HasTypeArray = new bool[1];
             beatmap.HasTypeArray[0] = true;
 
-            beatmap.StandardClear = false;
-            beatmap.HiddenClear = true;
-            beatmap.MinesClear = false;
-            beatmap.FullCombo = true;
-            beatmap.MaxPercentage = true;
-
             beatmap.ApproachRate = 5;
             beatmap.ObjectSize = 3;
             beatmap.HealthDrain = 5;
@@ -177,12 +165,6 @@
             beatmap.DatabaseTable = "testTable";
             beatmap.HasTypeArray = new bool[1];
             beatmap.HasTypeArray[0] = true;
-
-            beatmap.StandardClear = true;
-            beatmap.HiddenClear = true;
-            beatmap.MinesClear = true;
-            beatmap.FullCombo = true;
-            beatmap.MaxPercentage = true;
 
             beatmap.ApproachRate = 8;
             beatmap.ObjectSize = 4;

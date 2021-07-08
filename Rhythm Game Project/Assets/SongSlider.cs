@@ -22,15 +22,14 @@
         #endregion
 
         #region Properties
-        public float SongTimeSliderValue => songTimeSlider.value;
         public Transform SongTimeSliderCachedTransform => songTimeSliderCachedTransform;
         #endregion
 
         #region Public Methods
-        public void LerpSliderToValue(float _startingValue, float _endingValue, float _duration)
+        public void LerpSliderToValue(float _endingValue, float _duration)
         {
             StopLerpSliderToValueCoroutine();
-            lerpSliderToValueCoroutine = LerpSliderToValueCoroutine(_startingValue, _endingValue, _duration);
+            lerpSliderToValueCoroutine = LerpSliderToValueCoroutine(_endingValue, _duration);
             StartCoroutine(lerpSliderToValueCoroutine);
         }
 
@@ -48,21 +47,13 @@
             updateSongSliderProgressCoroutine = UpdateSongSliderProgressCoroutine();
             StartCoroutine(updateSongSliderProgressCoroutine);
         }
-
-        private void StopSongSliderProgressCoroutine()
-        {
-            if (updateSongSliderProgressCoroutine != null)
-            {
-                StopCoroutine(updateSongSliderProgressCoroutine);
-            }
-        }
         #endregion
 
         #region Private Methods
-        private IEnumerator LerpSliderToValueCoroutine(float _startingValue, float endingValue, float _duration)
+        private IEnumerator LerpSliderToValueCoroutine(float _endingValue, float _duration)
         {
             LeanTween.cancel(gameObject);
-            LeanTween.value(gameObject, _startingValue, endingValue, _duration).setOnUpdate((float _val) =>
+            LeanTween.value(gameObject, songTimeSlider.value, _endingValue, _duration).setOnUpdate((float _val) =>
             {
                 songTimeSlider.value = _val;
             });
@@ -87,6 +78,14 @@
                 yield return null;
             }
             yield return null;
+        }
+
+        private void StopSongSliderProgressCoroutine()
+        {
+            if (updateSongSliderProgressCoroutine != null)
+            {
+                StopCoroutine(updateSongSliderProgressCoroutine);
+            }
         }
         #endregion
     }

@@ -239,7 +239,7 @@
 
                         if (uwr.isNetworkError)
                         {
-                            notification.DisplayNotification(NotificationType.Error, "error loading image", 4f);
+                            notification.DisplayDescriptionNotification(ColorName.RED, "error loading image", _url, 4f);
                         }
                         else
                         {

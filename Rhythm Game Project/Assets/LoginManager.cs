@@ -5,54 +5,107 @@
     using TMPro;
     using Menu;
     using System.Collections;
+    using Loading;
+    using UnityEngine.Networking;
+    using Enums;
+    using Player;
 
     public sealed class LoginManager : MonoBehaviour
     {
+        #region Constants
+        private const string FieldUsername = "username";
+        private const string FieldPassword = "password";
+        private const string LoginUrl = "http://localhost/RhythmGameOnlineScripts/LoginScript.php";
+
+        private const string ConnectError = "connectError";
+        private const string UsernameCheckQueryError = "usernameCheckQueryError";
+        private const string UsernameDoesNotExistError = "usernameDoesNotExistError";
+        private const string WrongPasswordError = "wrongPasswordError";
+        private const string Success = "success";
+        #endregion
+
         #region Private Fields
         [SerializeField] private GameObject loginPanel = default;
-
-        private Transform loginPanelCachedTransform;
 
         [SerializeField] private TMP_InputField usernameInputField = default;
         [SerializeField] private TMP_InputField passwordInputField = default;
 
-        [SerializeField] private TextMeshProUGUI usernameErrorText = default;
-        [SerializeField] private TextMeshProUGUI passwordErrorText = default;
+        [SerializeField] private Image usernameValidationColorImage = default;
+        [SerializeField] private Image passwordValidationColorImage = default;
 
         [SerializeField] private Button submitButton = default;
 
-        private MenuManager menuManager;
+        [SerializeField] private LoadingIcon loadingIcon = default;
+
+        private Transform loginPanelTransform;
+
+        private IEnumerator escapeInputCheck;
+        private IEnumerator login;
+
+        private AccountPanel accountPanel;
+        private StartMenuManager startMenuManager;
+        private Notification notification;
+        private Player player;
+        private ModePanel modePanel;
+        private TextPanel textPanel;
         #endregion
 
         #region Public Methods
         public void TransitionIn()
         {
-            loginPanel.gameObject.SetActive(true);
-            loginPanelCachedTransform.localScale = Vector3.zero;
-            LeanTween.cancel(loginPanel);
-            LeanTween.scale(loginPanel, Vector3.one, 1f).setEaseOutExpo();
+            accountPanel.TransitionInPanel(loginPanelTransform);
+            textPanel.TransitionInPanel(new Vector3(0f, 580f, 0f), 467.5f);
+            startMenuManager.SetRhythmAndFadeTextWithTypingAnimation("login", "log into an existing account");
+            usernameInputField.Select();
+            EscapeInputCheck();
         }
 
-        public void TransitionOut()
+        public void TransitionOutToAccountPanel()
         {
+            StopAllCoroutines();
             loginPanel.gameObject.SetActive(false);
+            accountPanel.TransitionIn();
         }
 
-        public void Click_SubmitButton()
+        public void TransitionOutToModePanel()
+        {
+            StopAllCoroutines();
+            startMenuManager.TransitionOutStartPanel();
+            modePanel.TransitionIn();
+        }
+
+        public void SubmitButton_OnClick()
         {
             Login();
         }
 
-        public void Click_BackButton()
+        public void ValidateUsername()
         {
-            loginPanel.gameObject.SetActive(false);
-            menuManager.TransitionLoginPanelToAccountPanel();
+            if (usernameInputField.text.Length > 0)
+            {
+                accountPanel.SetValidationImageColorPass(usernameValidationColorImage);
+            }
+            else
+            {
+                accountPanel.SetValidationImageColorFail(usernameValidationColorImage);
+            }
         }
 
-        public void Validate_InputFieldLengths()
+        public void ValidatePassword()
         {
-            if (usernameInputField.text.Length > 0 &&
-                passwordInputField.text.Length > 0)
+            if (passwordInputField.text.Length > 0)
+            {
+                accountPanel.SetValidationImageColorPass(passwordValidationColorImage);
+            }
+            else
+            {
+                accountPanel.SetValidationImageColorFail(passwordValidationColorImage);
+            }
+        }
+
+        public void ValidateSubmitButton()
+        {
+            if (usernameInputField.text.Length > 0 && passwordInputField.text.Length > 0)
             {
                 submitButton.interactable = true;
             }
@@ -62,54 +115,145 @@
             }
         }
 
-        public void Validate_UsernameInputFieldLength()
+        public void OnSelectUsernameInputField()
         {
-            if (usernameInputField.text.Length > 0)
-            {
-                if (usernameErrorText.gameObject.activeSelf == true)
-                {
-                    usernameErrorText.gameObject.SetActive(false);
-                }
-            }
-            else
-            {
-                if (usernameErrorText.gameObject.activeSelf == false)
-                {
-                    usernameErrorText.gameObject.SetActive(true);
-                }
-            }
+            ValidateUsername();
+            textPanel.TypeText("enter your username");
         }
 
-        public void Validate_PasswordInputFieldLength()
+        public void OnSelectPasswordInputField()
         {
-            if (passwordInputField.text.Length > 0)
-            {
-                if (passwordErrorText.gameObject.activeSelf == true)
-                {
-                    passwordErrorText.gameObject.SetActive(false);
-                }
-            }
-            else
-            {
-                if (passwordErrorText.gameObject.activeSelf == false)
-                {
-                    passwordErrorText.gameObject.SetActive(true);
-                }
-            }
+            ValidatePassword();
+            textPanel.TypeText("enter your password");
+        }
+
+        public void OnEndEditUsernameInputField()
+        {
+            UtilityMethods.SelectNextSelectable(usernameInputField);
+        }
+
+        public void OnEndEditPasswordInputField()
+        {
+            UtilityMethods.SelectNextSelectable(passwordInputField);
+        }
+
+        public void LoginAsGuest()
+        {
+            player.LoginWithAccount("GUEST");
+            TransitionOutToModePanel();
         }
         #endregion
 
         #region Private Methods
         private void Awake()
         {
-            menuManager = FindObjectOfType<MenuManager>();
-            loginPanelCachedTransform = loginPanel.transform;
+            accountPanel = FindObjectOfType<AccountPanel>();
+            startMenuManager = FindObjectOfType<StartMenuManager>();
+            notification = FindObjectOfType<Notification>();
+            player = FindObjectOfType<Player>();
+            modePanel = FindObjectOfType<ModePanel>();
+            textPanel = FindObjectOfType<TextPanel>();
+
+            loginPanelTransform = loginPanel.transform;
+        }
+
+        private void EscapeInputCheck()
+        {
+            if (escapeInputCheck != null)
+            {
+                StopCoroutine(escapeInputCheck);
+            }
+
+            escapeInputCheck = EscapeInputCheckCoroutine();
+            StartCoroutine(escapeInputCheck);
+        }
+
+        private IEnumerator EscapeInputCheckCoroutine()
+        {
+            while (loginPanel.gameObject.activeSelf == true)
+            {
+                if (Input.anyKey)
+                {
+                    if (Input.GetKeyDown(KeyCode.Escape))
+                    {
+                        TransitionOutToAccountPanel();
+                    }
+                }
+                yield return null;
+            }
+            yield return null;
         }
 
         private void Login()
         {
-            loginPanel.gameObject.SetActive(false);
-            menuManager.TransitionLoginPanelToModePanel();
+            if (login != null)
+            {
+                StopCoroutine(login);
+            }
+
+            login = LoginCoroutine();
+            StartCoroutine(login);
+        }
+
+        private IEnumerator LoginCoroutine()
+        {
+            loadingIcon.DisplayLoadingIcon();
+            submitButton.interactable = false;
+
+            WWWForm form = new WWWForm();
+
+            form.AddField(FieldUsername, usernameInputField.text);
+            form.AddField(FieldPassword, passwordInputField.text);
+
+            UnityWebRequest www = UnityWebRequest.Post(LoginUrl, form);
+
+            yield return www.SendWebRequest();
+
+            loadingIcon.HideLoadingIcon();
+
+            if (www.downloadHandler.text == Success)
+            {
+                notification.DisplayDescriptionNotification(ColorName.LIGHT_GREEN, "logged in", $"playing as " +
+                    $"{usernameInputField.text}", 4f, VectorConstants.VectorPositionY356);
+
+                player.LoginWithAccount(usernameInputField.text);
+
+                yield return new WaitForSeconds(4f);
+
+                TransitionOutToModePanel();
+            }
+            else if (www.isNetworkError)
+            {
+                notification.DisplayDescriptionNotification(ColorName.RED, "network error", "unable to login, " +
+                    "please contact the developer", 8f, VectorConstants.VectorPositionY356);
+            }
+            else if (www.isHttpError)
+            {
+                notification.DisplayDescriptionNotification(ColorName.RED, "HTTP error", "unable to login, " +
+                    "please contact the developer", 8f, VectorConstants.VectorPositionY356);
+            }
+            else if (www.downloadHandler.text == ConnectError)
+            {
+                notification.DisplayDescriptionNotification(ColorName.RED, "connection error", "unable to login, " +
+                    "please contact the developer", 4f, VectorConstants.VectorPositionY356);
+            }
+            else if (www.downloadHandler.text == UsernameCheckQueryError)
+            {
+                notification.DisplayDescriptionNotification(ColorName.RED, "username check error", "unable to login, " +
+                    "please contact the developer", 8f, VectorConstants.VectorPositionY356);
+            }
+            else if (www.downloadHandler.text == UsernameDoesNotExistError)
+            {
+                notification.DisplayDescriptionNotification(ColorName.RED, "user does not exist error", "unable to login, " +
+                    "the username you entered does not exist", 8f, VectorConstants.VectorPositionY356);
+            }
+            else if (www.downloadHandler.text == WrongPasswordError)
+            {
+                notification.DisplayDescriptionNotification(ColorName.RED, "wrong password error", "unable to login, " +
+                    "the password entered is wrong", 8f, VectorConstants.VectorPositionY356);
+            }
+
+            yield return null;
         }
         #endregion
     }

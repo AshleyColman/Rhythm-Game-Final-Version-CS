@@ -119,7 +119,7 @@
             beatFlashCanvasGroup.alpha = 0f;
             LeanTween.cancel(beatFlashCanvasGroup.gameObject);
 
-            LeanTween.alphaCanvas(beatFlashCanvasGroup, 1f, 1f).setEasePunch();
+            LeanTween.alphaCanvas(beatFlashCanvasGroup, 1f, 0.2f).setLoopPingPong(1);
         }
 
         private void PlayGradeTextAnimation()

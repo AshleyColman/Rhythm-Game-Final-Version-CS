@@ -15,9 +15,6 @@
         #region Private Fields
         [SerializeField] private GameObject beatmapOverviewScreen = default;
 
-        [SerializeField] private TextMeshProUGUI songText = default;
-        [SerializeField] private TextMeshProUGUI artistText = default;
-        [SerializeField] private TextMeshProUGUI creatorText = default;
         [SerializeField] private TextMeshProUGUI approachRateText = default;
         [SerializeField] private TextMeshProUGUI objectSizeText = default;
         [SerializeField] private TextMeshProUGUI healthDrainText = default;
@@ -28,11 +25,9 @@
         [SerializeField] private DifficultyButton fourKeyDifficultyButton = default;
         [SerializeField] private DifficultyButton sixKeyDifficultyButton = default;
 
-        [SerializeField] private ChallengeButtonPanel challengeButtonPanel = default;
-
         [SerializeField] private KeyModeButton keyModeButton = default;
 
-        [SerializeField] private HorizontalTextScroller songTextScroller;
+        [SerializeField] private SongSliderProgressText songSlider = default;
 
         private IEnumerator loadBeatmapWithAudioAndImageCoroutine;
         private IEnumerator lerpDifficultyStatisticTextCoroutine;
@@ -47,13 +42,13 @@
         private FileManager fileManager;
         private BeatmapSelectManager beatmapSelectManager;
         private BeatmapPreview beatmapPreview;
-        private TopCanvasManager topCanvasManager;
         private DescriptionPanel descriptionPanel;
         private ColorCollection colorCollection;
         private MenuAudioManager menuAudioManager;
         private MenuTimeManager menuTimeManager;
         private BackgroundManager backgroundManager;
         private Leaderboard leaderboard;
+        private OverlayCanvasManager overlayCanvasManager;
         #endregion
 
         #region Properties
@@ -123,9 +118,9 @@
 
                 SetSelectedButtonIndex(_index);
 
-                songText.SetText(fileManager.Beatmap.SongName);
-                artistText.SetText(fileManager.Beatmap.ArtistName);
-                creatorText.SetText($"created by {fileManager.Beatmap.CreatorName}");
+                descriptionPanel.PlayNewTextThenDefaultTextArray($"{fileManager.Beatmap.SongName} " +
+                    $"{fileManager.Beatmap.ArtistName}");
+
                 keyModeButton.SetText($"{fileManager.Beatmap.TotalKeys}k");
 
                 keyModeButton.PlayButtonSelectedAnimation();
@@ -133,17 +128,14 @@
                 PlayDifficultyStatisticsAnimation();
 
                 UnselectCurrentDifficultyButton();
+
                 SelectBeatmapDifficulty();
 
-                challengeButtonPanel.SetButtonVisuals();
-
-                leaderboard.RequestNewLeaderboard();
-
-                songTextScroller.Scroll();
+                leaderboard.RequestLeaderboard();
             }
             else
             {
-                notification.DisplayNotification(NotificationType.Error, "beatmap file not found", 4f);
+                notification.DisplayDescriptionNotification(ColorName.RED, "beatmap file not found", beatmapPath, 4f);
             }
         }
 
@@ -152,7 +144,7 @@
         {
             LoadBeatmap(_index, _difficulty);
             beatmapPreview.SetBackgroundImage(_imageTexture);
-            beatmapPreview.ActivateSongSlider();
+            songSlider.UpdateSongSliderProgress();
         }
 
         public void LoadBeatmapWithAudioAndImage(int _index, Difficulty _difficulty, Texture _imageTexture,
@@ -234,7 +226,7 @@
             fileManager = FindObjectOfType<FileManager>();
             beatmapSelectManager = FindObjectOfType<BeatmapSelectManager>();
             beatmapPreview = FindObjectOfType<BeatmapPreview>();
-            topCanvasManager = FindObjectOfType<TopCanvasManager>();
+            overlayCanvasManager = FindObjectOfType<OverlayCanvasManager>();
             descriptionPanel = FindObjectOfType<DescriptionPanel>();
             colorCollection = FindObjectOfType<ColorCollection>();
             menuAudioManager = FindObjectOfType<MenuAudioManager>();
@@ -255,21 +247,21 @@
                 case Difficulty.TwoKey:
                     twoKeyDifficultyButton.SelectButton();
                     selectedDifficulty = Difficulty.TwoKey;
-                    notification.DisplayNotification(colorCollection.YellowColor080, "2K", 1f);
+                    notification.DisplayTitleNotification(ColorName.YELLOW, "2 key", 1f);
                     descriptionPanel.SetPanelColor(colorCollection.YellowColor080);
                     keyModeButton.SetColorImageColor(colorCollection.YellowColor);
                     break;
                 case Difficulty.FourKey:
                     fourKeyDifficultyButton.SelectButton();
                     selectedDifficulty = Difficulty.FourKey;
-                    notification.DisplayNotification(colorCollection.PinkColor080, "4K", 1f);
+                    notification.DisplayTitleNotification(ColorName.PINK, "4 key", 1f);
                     descriptionPanel.SetPanelColor(colorCollection.PinkColor080);
                     keyModeButton.SetColorImageColor(colorCollection.PinkColor);
                     break;
                 case Difficulty.SixKey:
                     sixKeyDifficultyButton.SelectButton();
                     selectedDifficulty = Difficulty.SixKey;
-                    notification.DisplayNotification(colorCollection.RedColor080, "6K", 1f);
+                    notification.DisplayTitleNotification(ColorName.RED, "6 key", 1f);
                     descriptionPanel.SetPanelColor(colorCollection.RedColor080);
                     keyModeButton.SetColorImageColor(colorCollection.RedColor);
                     break;
@@ -314,17 +306,7 @@
             backgroundManager.TransitionAndLoadNewImage(_imageTexture);
             beatmapPreview.SetBackgroundImage(_imageTexture);
             menuAudioManager.LoadSongAudioClipFromFile($"{fileManager.BeatmapDirectories[selectedButtonIndex]}", _audioStartTime,
-                menuTimeManager);
-
-            yield return waitForSeconds;
-
-            beatmapPreview.SongSlider.LerpSliderToValue(beatmapPreview.SongSlider.SongTimeSliderValue,
-                UtilityMethods.GetSliderValuePercentageFromTime(_audioStartTime, menuAudioManager.SongAudioSource.clip.length),
-                MenuAudioManager.AudioClipLoadDelayDuration);
-
-            yield return waitForSeconds;
-
-            beatmapPreview.ActivateSongSlider();
+                menuTimeManager, songSlider);
 
             yield return null;
         }

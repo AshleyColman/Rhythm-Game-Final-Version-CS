@@ -12,29 +12,46 @@
     using Grade;
     using File;
     using ImageLoad;
+    using Enums;
+    using Player;
 
     public sealed class Leaderboard : MonoBehaviour
     {
         #region Constants
         private const int Placements = 10;
         private const int PlayernameUrlIndex = 0;
-        private const int CategoryUrlIndex = 1;
+        private const int ScoreUrlIndex = 1;
         private const int AccuracyUrlIndex = 2;
-        private const int DateUrlIndex = 3;
-        private const int ImageUrlIndex = 4;
-        private const int LevelUrlIndex = 5;
+        private const int ComboUrlIndex = 3;
+        private const int DateUrlIndex = 4;
+        private const int ClearPointsUrlIndex = 5;
+        private const int HiddenPointsUrlIndex = 6;
+        private const int MinePointsUrlIndex = 7;
+        private const int LowApproachRatePointsUrlIndex = 8;
+        private const int HighApproachRatePointsUrlIndex = 9;
+        private const int FullComboPointsUrlIndex = 10;
+        private const int MaxPercentagePointsUrlIndex = 11;
+        private const int ImageUrlIndex = 12;
+        private const int LevelUrlIndex = 13;
         private const int PersonalBestScoreUrlIndex = 0;
         private const int PersonalBestAccuracyUrlIndex = 1;
-        private const int PersonalBestDateUrlIndex = 2;
+        private const int PersonalBestComboUrlIndex = 2;
         private const int PersonalBestPerfectUrlIndex = 3;
         private const int PersonalBestGreatUrlIndex = 4;
         private const int PersonalBestOkayUrlIndex = 5;
         private const int PersonalBestMissUrlIndex = 6;
         private const int PersonalBestFeverUrlIndex = 7;
         private const int PersonalBestBonusUrlIndex = 8;
-        private const int PersonalBestComboUrlIndex = 9;
-        private const int PersonalBestPlacementUrlIndex = 10;
-        private const int PersonalBestTotalRecordsUrlIndex = 11;
+        private const int PersonalBestDateUrlIndex = 9;
+        private const int PersonalBestClearPointsUrlIndex = 10;
+        private const int PersonalBestHiddenPointsUrlIndex = 11;
+        private const int PersonalBestMinePointsUrlIndex = 12;
+        private const int PersonalBestLowApproachRatePointsUrlIndex = 13;
+        private const int PersonalBestHighApproachRatePointsUrlIndex = 14;
+        private const int PersonalBestFullComboPointsUrlIndex = 15;
+        private const int PersonalBestMaxPercentagePointsUrlIndex = 16;
+        private const int PersonalBestPlacementUrlIndex = 17;
+        private const int PersonalBestTotalRecordsUrlIndex = 18;
         private const int CategoryScoreIndex = 0;
         private const int CatagoryAccuracyIndex = 1;
         private const int CatagoryComboIndex = 2;
@@ -51,10 +68,6 @@
         private const string RetrieveButtonInformationUrl = "http://localhost/RhythmGameOnlineScripts/RetrievePlayerBeatmapRankingScript.php";
         private const string RetrievePersonalBestInformationUrl = "http://localhost/RhythmGameOnlineScripts/RetrievePersonalBestRankingScript.php";
         private const string TestTableName = "testtable";
-        private const string CategoryScoreNotification = "score";
-        private const string CategoryAccuracyNotification = "accuracy";
-        private const string CategoryComboNotification = "combo";
-        private const string ViewNotification = "local scores not available, please wait for a future update.";
         #endregion
 
         #region Private Fields
@@ -88,8 +101,22 @@
         private GradeData gradedata;
         private ImageLoader imageLoader;
         private Notification notification;
-        private ColorCollection colorCollection;
         private FileManager fileManager;
+        #endregion
+
+        #region Public Methods
+        public void RequestLeaderboard()
+        {
+            ResetLeaderboard();
+
+            if (requestLeaderboard != null)
+            {
+                StopCoroutine(requestLeaderboard);
+            }
+
+            requestLeaderboard = RequestLeaderboardCoroutine();
+            StartCoroutine(requestLeaderboard);
+        }
         #endregion
 
         #region Private Methods
@@ -98,7 +125,6 @@
             gradedata = FindObjectOfType<GradeData>();
             imageLoader = FindObjectOfType<ImageLoader>();
             notification = FindObjectOfType<Notification>();
-            colorCollection = FindObjectOfType<ColorCollection>();
             fileManager = FindObjectOfType<FileManager>();
         }
 
@@ -106,14 +132,6 @@
         {
             SetupLeaderboard();
             HideLeaderboard();
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                RequestNewLeaderboard();
-            }
         }
 
         private void SetupLeaderboard()
@@ -131,15 +149,44 @@
             }
         }
 
-        private void RequestLeaderboard()
+        private void ResetLeaderboard()
         {
-            if (requestLeaderboard != null)
-            {
-                StopCoroutine(requestLeaderboard);
-            }
+            StopAllCoroutines();
+            ResetReferencedScripts();
+            HideLeaderboard();
+            ResetLeaderboardButtonLevelSliders();
+            ResetVariables();
+            loadingIcon.DisplayLoadingIcon();
+        }
 
-            requestLeaderboard = RequestLeaderboardCoroutine();
-            StartCoroutine(requestLeaderboard);
+        private void ResetReferencedScripts()
+        {
+            gradedata.StopAllCoroutines();
+            imageLoader.StopAllCoroutines();
+            notification.StopTransitionOutCoroutine();
+            fileManager.StopAllCoroutines();
+            scrollRectOcclusion.StopAllCoroutines();
+            personalBestButton.StopAllCoroutines();
+            loadingIcon.StopAllCoroutines();
+
+            for (byte i = 0; i < buttonArr.Length; i++)
+            {
+                buttonArr[i].StopAllCoroutines();
+            }
+        }
+
+        private void ResetVariables()
+        {
+            imageUpdatedCount = default;
+            hasLoadedPersonalBest = false;
+        }
+
+        private void ResetLeaderboardButtonLevelSliders()
+        {
+            for (byte i = 0; i < buttonArr.Length; i++)
+            {
+                buttonArr[i].ResetLevelSliderValue();
+            }
         }
 
         private IEnumerator RequestLeaderboardCoroutine()
@@ -150,7 +197,7 @@
                 yield return new WaitForSeconds(0.2f);
             }
 
-            switch (ProfileManager.LoggedIn)
+            switch (Player.LoggedIn)
             {
                 case true:
                     RetrievePersonalBestInformation();
@@ -189,11 +236,8 @@
             {
                 // Split the information retrieved from the database into array cells.
                 placementDataArr[_index] = Regex.Split(www.downloadHandler.text, RegixSplit);
-                // Update button text.
-                UpdateButtonText(_index);
-                // Load image.
-                imageLoader.LoadCompressedImageUrl(placementDataArr[_index][ImageUrlIndex], buttonArr[_index].ProfileImage,
-                    IncrementTotalImagesUpdated);
+
+                UpdateButtonVisuals(_index);
             }
         }
 
@@ -207,7 +251,7 @@
             WWWForm form = new WWWForm();
             //form.AddField(FIELD_DATABASE_TABLE, FileManager.beatmap.DatabaseTable);
             form.AddField(FieldDatabaseTable, TestTableName);
-            form.AddField(FieldUsername, ProfileManager.Username);
+            form.AddField(FieldUsername, Player.Username);
 
             UnityWebRequest www = UnityWebRequest.Post(RetrievePersonalBestInformationUrl, form);
 
@@ -220,7 +264,7 @@
             else
             {
                 personalBestPlacementDataArr = Regex.Split(www.downloadHandler.text, RegixSplit);
-                UpdatePersonalBestButtonText();
+                UpdatePersonalBestButtonVisuals();
                 CheckIfReadyToDisplayLeaderboard();
             }
         }
@@ -243,7 +287,7 @@
                 buttonArr[i].gameObject.SetActive(true);
             }
 
-            personalBestButton.gameObject.SetActive(true);
+            personalBestButton.DisplayPersonalBest();
             yield return new WaitForEndOfFrame();
 
             // Initialize scroll rect occlusion attached now that all buttons are instantiated.
@@ -253,7 +297,35 @@
             // Reset position to occlude off screen buttons.
             scrollRectOcclusion.ScrollToDefault();
 
+            // Lerps button text and slider.
+            PlayButtonAnimation();
+
             yield return null;
+        }
+
+        private void PlayButtonAnimation()
+        {
+            for (int i = 0; i < buttonArr.Length; i++)
+            {
+                if (buttonArr[i].gameObject.activeSelf == true)
+                {
+                    buttonArr[i].PlayFlashAnimationForAchievedButtons();
+
+                    if (placementDataArr[i] != null)
+                    {
+                        buttonArr[i].PlayLerpAnimation(
+                        float.Parse(placementDataArr[i][ScoreUrlIndex]),
+                        float.Parse(placementDataArr[i][AccuracyUrlIndex]),
+                        float.Parse(placementDataArr[i][ComboUrlIndex]),
+                        float.Parse(placementDataArr[i][LevelUrlIndex])
+                        );
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
         }
 
         private void IncrementTotalImagesUpdated()
@@ -277,49 +349,71 @@
             }
         }
 
+        private void UpdatePersonalBestButtonVisuals()
+        {
+            UpdatePersonalBestChallengeButtonPanel();
+            UpdatePersonalBestButtonText();
+        }
+
+        private void UpdatePersonalBestChallengeButtonPanel()
+        {
+            personalBestButton.SetChallengeButtonPanelVisual(
+                personalBestPlacementDataArr[PersonalBestClearPointsUrlIndex],
+                 personalBestPlacementDataArr[PersonalBestHiddenPointsUrlIndex],
+                  personalBestPlacementDataArr[PersonalBestMinePointsUrlIndex],
+                   personalBestPlacementDataArr[PersonalBestLowApproachRatePointsUrlIndex],
+                    personalBestPlacementDataArr[PersonalBestHighApproachRatePointsUrlIndex],
+                     personalBestPlacementDataArr[PersonalBestFullComboPointsUrlIndex],
+                      personalBestPlacementDataArr[PersonalBestMaxPercentagePointsUrlIndex]
+                );
+        }
+
         private void UpdatePersonalBestButtonText()
         {
-            personalBestButton.DeactivateNoRecordSetText();
-            personalBestButton.ActivateContentPanel();
-
             // Index's are offset by 1 as the php script does not need to return a name.
-            personalBestButton.SetPlayerScoreComboText($"{ProfileManager.Username} " +
-                $"{personalBestPlacementDataArr[PersonalBestScoreUrlIndex]} " +
-                $"{personalBestPlacementDataArr[PersonalBestComboUrlIndex]}x");
+            personalBestButton.SetButtonText(
+                $"{personalBestPlacementDataArr[PersonalBestScoreUrlIndex]}",
+                $"{personalBestPlacementDataArr[PersonalBestComboUrlIndex]}x",
+                $"{personalBestPlacementDataArr[PersonalBestPerfectUrlIndex]}",
+                $"{personalBestPlacementDataArr[PersonalBestGreatUrlIndex]}",
+                $"{personalBestPlacementDataArr[PersonalBestOkayUrlIndex]}",
+                $"{personalBestPlacementDataArr[PersonalBestMissUrlIndex]}",
+                $"{personalBestPlacementDataArr[PersonalBestFeverUrlIndex]}",
+                $"{personalBestPlacementDataArr[PersonalBestBonusUrlIndex]}",
+                $"#{personalBestPlacementDataArr[PersonalBestPlacementUrlIndex]} of " +
+                $"{personalBestPlacementDataArr[PersonalBestTotalRecordsUrlIndex]}"
+                );
 
-            personalBestButton.SetAccuracyText($"{personalBestPlacementDataArr[PersonalBestAccuracyUrlIndex]}%");
-
-            personalBestButton.SetPerfectText($"p:{personalBestPlacementDataArr[PersonalBestPerfectUrlIndex]}");
-
-            personalBestButton.SetGreatText($"g:{personalBestPlacementDataArr[PersonalBestGreatUrlIndex]}");
-
-            personalBestButton.SetOkayText($"o:{personalBestPlacementDataArr[PersonalBestOkayUrlIndex]}");
-
-            personalBestButton.SetMissText($"m:{personalBestPlacementDataArr[PersonalBestMissUrlIndex]}");
-
-            personalBestButton.SetFeverText($"f:{personalBestPlacementDataArr[PersonalBestFeverUrlIndex]}");
-
-            personalBestButton.SetBonusText($"b:{personalBestPlacementDataArr[PersonalBestBonusUrlIndex]}");
-
-            personalBestButton.SetDateText(UtilityMethods.GetTimeSinceDateInput(personalBestPlacementDataArr
-                [PersonalBestDateUrlIndex]));
-
-            personalBestButton.SetPositionText($"#{personalBestPlacementDataArr[PersonalBestPlacementUrlIndex]} of " +
-                $"{personalBestPlacementDataArr[PersonalBestTotalRecordsUrlIndex]}");
-
-            TextMeshProUGUI gradeText = gradedata.GetGradeText(float.Parse(personalBestPlacementDataArr
-                [PersonalBestAccuracyUrlIndex]));
-            personalBestButton.SetGradeText(gradeText.text, gradeText.colorGradientPreset);
+            //TextMeshProUGUI gradeText = gradedata.GetGradeText(float.Parse(personalBestPlacementDataArr
+            //    [PersonalBestAccuracyUrlIndex]));
+            //personalBestButton.SetGradeText(gradeText.text, gradeText.colorGradientPreset);
 
             hasLoadedPersonalBest = true;
         }
 
         private void DisplayPersonalBestNoRecord()
         {
-            personalBestButton.DeactivateContentPanel();
-            personalBestButton.ActivateNoRecordText();
+            personalBestButton.SetButtonTextNoRecord();
             hasLoadedPersonalBest = true;
             CheckIfReadyToDisplayLeaderboard();
+        }
+
+        private void UpdateButtonVisuals(int _index)
+        {
+            UpdateButtonText(_index);
+
+            imageLoader.LoadCompressedImageUrl(placementDataArr[_index][ImageUrlIndex], buttonArr[_index].ProfileImage,
+                IncrementTotalImagesUpdated);
+
+            buttonArr[_index].SetChallengeButtonPanelVisual(
+                placementDataArr[_index][ClearPointsUrlIndex],
+                placementDataArr[_index][HiddenPointsUrlIndex],
+                placementDataArr[_index][MinePointsUrlIndex],
+                placementDataArr[_index][LowApproachRatePointsUrlIndex],
+                placementDataArr[_index][HighApproachRatePointsUrlIndex],
+                placementDataArr[_index][FullComboPointsUrlIndex],
+                placementDataArr[_index][MaxPercentagePointsUrlIndex]
+                );
         }
 
         private void UpdateButtonText(int _index)
@@ -328,9 +422,11 @@
             buttonArr[_index].DeactivateNoRecordSetText();
 
             buttonArr[_index].SetNameText(placementDataArr[_index][PlayernameUrlIndex]);
-            buttonArr[_index].SetLevelText($"lvl {placementDataArr[_index][LevelUrlIndex]}");
+            buttonArr[_index].SetComboAndAccuracyText($"{placementDataArr[_index][ComboUrlIndex]}  " +
+                $"{placementDataArr[_index][AccuracyUrlIndex]}%");
+            buttonArr[_index].SetLevel(placementDataArr[_index][LevelUrlIndex]);
             buttonArr[_index].SetDateText(UtilityMethods.GetTimeSinceDateInput(placementDataArr[_index][DateUrlIndex]));
-            buttonArr[_index].SetCategoryText($"{placementDataArr[_index][CategoryUrlIndex]}");
+            buttonArr[_index].SetScoreText(placementDataArr[_index][ScoreUrlIndex]);
 
             TextMeshProUGUI gradeText = gradedata.GetGradeText(float.Parse(placementDataArr[_index][AccuracyUrlIndex]));
             buttonArr[_index].SetGradeText(gradeText.text, gradeText.colorGradientPreset);
@@ -367,7 +463,7 @@
                 }
             }
 
-            personalBestButton.gameObject.SetActive(false);
+            personalBestButton.DeactivatePersonalBest();
         }
 
         private void HideLeaderboard()
@@ -382,45 +478,23 @@
             HideAllButtons();
         }
 
-        // Reset leaderboard.
-        private void ResetLeaderboard()
-        {
-            StopAllCoroutines();
-            HideLeaderboard();
-            ResetVariables();
-            loadingIcon.DisplayLoadingIcon();
-        }
-
-        // Resets and requests a new leaderboard to be loaded.
-        public void RequestNewLeaderboard()
-        {
-            ResetLeaderboard();
-            RequestLeaderboard();
-        }
-
-        private void ResetVariables()
-        {
-            imageUpdatedCount = default;
-            hasLoadedPersonalBest = false;
-        }
-
         // Is called when the category dropdown value has been changed.
         public void CategoryDropdownValueChange()
         {
             switch (categorySortDropdown.value)
             {
                 case CategoryScoreIndex:
-                    notification.DisplayNotification(colorCollection.PurpleColor080, CategoryScoreNotification, 4f);
+                    notification.DisplayDescriptionNotification(ColorName.PURPLE, "score", "displaying top score plays", 4f);
                     break;
                 case CatagoryAccuracyIndex:
-                    notification.DisplayNotification(colorCollection.PurpleColor080, CategoryAccuracyNotification, 4f);
+                    notification.DisplayDescriptionNotification(ColorName.PURPLE, "accuracy", "displaying top accuracy plays", 4f);
                     break;
                 case CatagoryComboIndex:
-                    notification.DisplayNotification(colorCollection.PurpleColor080, CategoryComboNotification, 4f);
+                    notification.DisplayDescriptionNotification(ColorName.PURPLE, "combo", "displaying top combo plays", 4f);
                     break;
             }
 
-            RequestNewLeaderboard();
+            RequestLeaderboard();
         }
 
         // Is called when the view dropdown value has been changed.
@@ -428,7 +502,9 @@
         {
             viewSortDropdown.value = ViewGlobalIndex;
 
-            notification.DisplayNotification(colorCollection.RedColor080, ViewNotification, 4f);
+            notification.DisplayDescriptionNotification(ColorName.RED, "global",
+                "showing top global plays, local scores coming in a future update",
+                4f);
         }
         #endregion
     }

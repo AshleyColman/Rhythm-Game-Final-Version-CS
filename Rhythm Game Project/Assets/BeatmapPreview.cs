@@ -8,12 +8,6 @@
     {
         #region Private Fields
         [SerializeField] private Image backgroundImage = default;
-
-        [SerializeField] private SongSliderProgressText songSlider = default;
-        #endregion
-
-        #region Properties
-        public SongSliderProgressText SongSlider => songSlider;
         #endregion
 
         #region Public Methods
@@ -22,11 +16,6 @@
             backgroundImage.gameObject.SetActive(false);
             backgroundImage.material.mainTexture = _imageTexture;
             backgroundImage.gameObject.SetActive(true);
-        }
-
-        public void ActivateSongSlider()
-        {
-            songSlider.UpdateSongSliderProgress();
         }
         #endregion
     }
