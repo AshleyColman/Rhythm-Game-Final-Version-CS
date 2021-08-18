@@ -6,3 +6,6 @@ The original 1 to 160 commit files can be found at: https://github.com/Ashleyc97
 
 <img src="https://github.com/Ashleyc97/Rhythm-Game-Final-Version-CS/blob/master/Gifs/Gif6.gif"/>
 <img src="https://github.com/Ashleyc97/Rhythm-Game-Final-Version-CS/blob/master/Gifs/FreedomDive.gif"/>
+
+# Gameplay Video
+https://youtu.be/x7Hak2LSvgA
